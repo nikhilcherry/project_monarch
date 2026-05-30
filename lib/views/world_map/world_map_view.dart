@@ -5,6 +5,7 @@ import '../../controllers/map_controller.dart';
 import '../../controllers/providers.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/workout_node.dart';
+import '../active_workout/active_workout_view.dart';
 import 'map_connections_painter.dart';
 import 'map_node_widget.dart';
 import 'node_detail_sheet.dart';
@@ -97,10 +98,10 @@ class WorldMapView extends ConsumerWidget {
         },
         onStart: () {
           Navigator.of(sheetContext).pop();
-          // Active Workout flow lands in the next phase (5c). For now, surface
-          // intent so the navigation contract is clear.
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Entering ${node.title}… (workout in 5c)')),
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => ActiveWorkoutView(nodeId: node.id),
+            ),
           );
         },
       ),
