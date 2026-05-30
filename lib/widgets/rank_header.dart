@@ -4,12 +4,23 @@ import '../core/constants/app_colors.dart';
 import '../models/rank_profile.dart';
 import 'glow_panel.dart';
 
-/// Top-of-dashboard hero: big rank badge, level, the neon EXP progress bar, and
-/// the coin balance.
+/// Top-of-dashboard hero: big rank badge, equipped title/badge, level, the neon
+/// EXP progress bar, and the coin balance.
 class RankHeader extends StatelessWidget {
-  const RankHeader({super.key, required this.profile});
+  const RankHeader({
+    super.key,
+    required this.profile,
+    this.title = 'Novice Hunter',
+    this.badgeIcon,
+  });
 
   final RankProfile profile;
+
+  /// Equipped cosmetic title from the shop.
+  final String title;
+
+  /// Equipped cosmetic badge icon, or null if none.
+  final IconData? badgeIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +39,25 @@ class RankHeader extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      children: [
+                        if (badgeIcon != null) ...[
+                          Icon(badgeIcon, color: AppColors.accent, size: 16),
+                          const SizedBox(width: 6),
+                        ],
+                        Flexible(
+                          child: Text(
+                            title,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: AppColors.accent,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
                     Text('LEVEL ${profile.level}',
                         style: textTheme.titleMedium?.copyWith(
                           color: AppColors.textPrimary,

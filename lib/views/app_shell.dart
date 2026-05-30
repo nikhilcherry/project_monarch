@@ -4,6 +4,7 @@ import '../core/constants/app_colors.dart';
 import 'dashboard/dashboard_view.dart';
 import 'habits/habits_view.dart';
 import 'nutrition/nutrition_view.dart';
+import 'shop/shop_view.dart';
 import 'world_map/world_map_view.dart';
 
 /// Root navigation shell with a neon bottom bar. Screens still to come
@@ -25,6 +26,7 @@ class _AppShellState extends State<AppShell> {
     WorldMapView(),
     HabitsView(),
     NutritionView(),
+    ShopView(),
   ];
 
   @override
@@ -58,6 +60,11 @@ class _AppShellState extends State<AppShell> {
               icon: Icon(Icons.restaurant_outlined),
               activeIcon: Icon(Icons.restaurant),
               label: 'Fuel',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.storefront_outlined),
+              activeIcon: Icon(Icons.storefront),
+              label: 'Shop',
             ),
           ],
         ),

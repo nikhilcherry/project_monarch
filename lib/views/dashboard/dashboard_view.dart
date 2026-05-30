@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../controllers/providers.dart';
+import '../../controllers/shop_controller.dart';
 import '../../core/constants/app_colors.dart';
 import '../../widgets/consistency_heatmap.dart';
 import '../../widgets/glow_panel.dart';
@@ -19,6 +20,8 @@ class DashboardView extends ConsumerWidget {
     final stats = ref.watch(userStatsProvider);
     final heatmap = ref.watch(heatmapDataProvider);
     final streak = ref.watch(streakProvider);
+    final title = ref.watch(equippedTitleNameProvider);
+    final badge = ref.watch(equippedBadgeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +37,11 @@ class DashboardView extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
           children: [
-            RankHeader(profile: profile),
+            RankHeader(
+              profile: profile,
+              title: title,
+              badgeIcon: badge?.icon,
+            ),
             const SizedBox(height: 20),
 
             // --- Attribute radar ------------------------------------------
