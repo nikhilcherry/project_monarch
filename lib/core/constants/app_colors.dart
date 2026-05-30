@@ -55,8 +55,11 @@ abstract final class AppColors {
   /// Danger — failed penalty quest, broken streak.
   static const Color danger = Color(0xFFFF3B5C);
 
-  /// In-game currency accent (coins).
+  /// In-game currency accent (coins — Shop).
   static const Color coin = Color(0xFFFFD54F);
+
+  /// World Map currency accent (crystals — Daily Quests).
+  static const Color crystal = Color(0xFFB388FF);
 
   // ---------------------------------------------------------------------------
   // Stat colors (radar chart — STR / AGI / VIT / END / FLEX)

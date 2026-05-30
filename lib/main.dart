@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/constants/app_strings.dart';
 import 'core/database/database_service.dart';
+import 'core/database/migrations.dart';
 import 'core/theme/app_theme.dart';
 import 'views/app_shell.dart';
 
@@ -33,6 +34,8 @@ Future<void> main() async {
   // TypeAdapter and opens all boxes (single source of truth).
   await Hive.initFlutter();
   await DatabaseService.init();
+  // Apply one-shot schema migrations (v1 -> v2 wipe & regenerate).
+  await AppMigrations.run();
 
   runApp(const ProviderScope(child: MonarchApp()));
 }

@@ -24,7 +24,7 @@ class WorldMapView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nodes = ref.watch(worldMapProvider);
-    final coins = ref.watch(rankProfileProvider).coins;
+    final crystals = ref.watch(rankProfileProvider).crystals;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,12 +34,11 @@ class WorldMapView extends ConsumerWidget {
             padding: const EdgeInsets.only(right: 12),
             child: Row(
               children: [
-                const Icon(Icons.monetization_on,
-                    color: AppColors.coin, size: 18),
+                const Icon(Icons.diamond, color: AppColors.crystal, size: 18),
                 const SizedBox(width: 4),
-                Text('$coins',
+                Text('$crystals',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppColors.coin,
+                          color: AppColors.crystal,
                         )),
               ],
             ),
@@ -112,7 +111,7 @@ class WorldMapView extends ConsumerWidget {
     final message = switch (outcome) {
       UnlockOutcome.success => 'Gate unlocked. The path opens.',
       UnlockOutcome.insufficientCoins =>
-        'System Warning: insufficient coins.',
+        'System Warning: not enough Crystals. Complete Daily Quests to earn more.',
       UnlockOutcome.notUnlockable => 'This gate cannot be opened yet.',
     };
     ScaffoldMessenger.of(context).showSnackBar(

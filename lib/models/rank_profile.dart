@@ -27,7 +27,8 @@ class RankProfile extends HiveObject {
   @HiveField(3)
   int level;
 
-  /// Spendable in-game currency for unlocking map nodes & cosmetics.
+  /// Spendable Shop currency (cosmetics + alternate realms). NEVER spent on the
+  /// World Map — that is Crystals only (see [crystals]).
   @HiveField(4)
   int coins;
 
@@ -36,6 +37,14 @@ class RankProfile extends HiveObject {
   @HiveField(5)
   double expToNextRank;
 
+  /// World Map currency. Earned ONLY from Daily Quests (Phase 2); spent ONLY to
+  /// unlock map nodes. Strictly separated from [coins].
+  @HiveField(6)
+  int crystals;
+
+  /// The rank factor `R = tier + 1` (1…9) used by the v2 scaling tables.
+  int get rankFactor => rank.tier + 1;
+
   RankProfile({
     this.rank = Rank.e,
     this.currentExp = 0,
@@ -43,9 +52,12 @@ class RankProfile extends HiveObject {
     this.level = 1,
     this.coins = 0,
     this.expToNextRank = 100,
+    this.crystals = 0,
   });
 
-  factory RankProfile.initial() => RankProfile();
+  /// A fresh hunter starts with a small Crystal float so the first map nodes are
+  /// immediately reachable before the first Daily Quest payout.
+  factory RankProfile.initial() => RankProfile(crystals: 30);
 
   /// Fraction [0,1] of the current rank completed — drives the EXP bar.
   double get rankProgress {
@@ -62,6 +74,7 @@ class RankProfile extends HiveObject {
     int? level,
     int? coins,
     double? expToNextRank,
+    int? crystals,
   }) =>
       RankProfile(
         rank: rank ?? this.rank,
@@ -70,10 +83,11 @@ class RankProfile extends HiveObject {
         level: level ?? this.level,
         coins: coins ?? this.coins,
         expToNextRank: expToNextRank ?? this.expToNextRank,
+        crystals: crystals ?? this.crystals,
       );
 
   @override
   String toString() =>
       'RankProfile(${rank.label} Lv$level | EXP ${currentExp.toStringAsFixed(0)}/'
-      '${expToNextRank.toStringAsFixed(0)} | coins:$coins)';
+      '${expToNextRank.toStringAsFixed(0)} | coins:$coins crystals:$crystals)';
 }

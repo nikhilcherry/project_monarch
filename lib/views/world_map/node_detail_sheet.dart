@@ -143,8 +143,8 @@ class _PrimaryAction extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: onUnlock,
-            icon: const Icon(Icons.lock_open),
-            label: Text('UNLOCK — ${node.unlockCost} COINS'),
+            icon: const Icon(Icons.diamond, size: 18),
+            label: Text('UNLOCK — ${node.unlockCost} CRYSTALS'),
           ),
         ),
       NodeStatus.unlocked || NodeStatus.completed => SizedBox(

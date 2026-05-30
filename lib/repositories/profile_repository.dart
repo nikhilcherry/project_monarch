@@ -45,4 +45,19 @@ class ProfileRepository {
     final profile = getOrCreate();
     await save(profile.copyWith(coins: profile.coins + amount));
   }
+
+  // --- Crystals (World Map currency) ---------------------------------------
+
+  /// Spend crystals if affordable. Returns false (and changes nothing) if short.
+  Future<bool> spendCrystals(int cost) async {
+    final profile = getOrCreate();
+    if (profile.crystals < cost) return false;
+    await save(profile.copyWith(crystals: profile.crystals - cost));
+    return true;
+  }
+
+  Future<void> addCrystals(int amount) async {
+    final profile = getOrCreate();
+    await save(profile.copyWith(crystals: profile.crystals + amount));
+  }
 }

@@ -40,15 +40,17 @@ class WorldMapNotifier extends Notifier<List<WorkoutNode>> {
     return null;
   }
 
-  /// Spend coins to unlock an `unlockable` node.
+  /// Spend Crystals (the World Map currency) to unlock an `unlockable` node.
+  /// Coins are never accepted here.
   Future<UnlockOutcome> unlock(String id) async {
     final node = byId(id);
     if (node == null || node.status != NodeStatus.unlockable) {
       return UnlockOutcome.notUnlockable;
     }
 
-    final paid =
-        await ref.read(rankProfileProvider.notifier).spendCoins(node.unlockCost);
+    final paid = await ref
+        .read(rankProfileProvider.notifier)
+        .spendCrystals(node.unlockCost);
     if (!paid) return UnlockOutcome.insufficientCoins;
 
     await _repo.markUnlocked(id);
