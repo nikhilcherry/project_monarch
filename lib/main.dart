@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/constants/app_colors.dart';
 import 'core/constants/app_strings.dart';
+import 'core/database/database_service.dart';
 import 'core/theme/app_theme.dart';
 
 /// Entry point for Project Monarch.
@@ -28,8 +29,10 @@ Future<void> main() async {
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(AppTheme.overlayStyle);
 
-  // Local database — fully offline. (Adapters registered in Phase 3.)
+  // Local database — fully offline. Boots the Hive engine, registers every
+  // TypeAdapter and opens all boxes (single source of truth).
   await Hive.initFlutter();
+  await DatabaseService.init();
 
   runApp(const ProviderScope(child: MonarchApp()));
 }
