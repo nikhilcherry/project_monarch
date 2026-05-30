@@ -37,9 +37,27 @@ class PenaltiesNotifier extends Notifier<List<PenaltyQuest>> {
 
   @override
   List<PenaltyQuest> build() {
-    // Reconcile missed days, then expose the active penalties.
-    _runDailyCheck();
+    // One-time cleanup + daily reconcile, then refresh state when done.
+    _init();
     return _penalties.active();
+  }
+
+  Future<void> _init() async {
+    await _migrateClearFirstRunPenalties();
+    await _runDailyCheck();
+    state = _penalties.active();
+  }
+
+  /// One-time fix for installs that received bogus penalty quests from the old
+  /// first-run logic (which retroactively penalized days before install).
+  /// Clears any active penalties exactly once. Safe because the only penalties
+  /// that can exist at upgrade time are those erroneous first-run ones.
+  Future<void> _migrateClearFirstRunPenalties() async {
+    final box = DatabaseService.settingsBox;
+    const flag = 'penalty_firstrun_fix_v1';
+    if (box.get(flag, defaultValue: false) as bool) return;
+    await _penalties.resolveAllActive();
+    await box.put(flag, true);
   }
 
   /// Walk every elapsed day since the last check up to yesterday. Rest days are
@@ -51,10 +69,16 @@ class PenaltiesNotifier extends Notifier<List<PenaltyQuest>> {
     final todayKey = ConsistencyRepository.keyFor(today);
 
     final lastKey = _schedule.lastCheckDayKey();
-    // First run: look back a week so we don't fabricate a huge penalty history.
-    DateTime cursor = lastKey != null
-        ? _parse(lastKey).add(const Duration(days: 1))
-        : today.subtract(const Duration(days: 7));
+
+    // First launch ever: establish today as the baseline and DO NOT penalize
+    // days before the user installed the app. Penalties only accrue from the
+    // first day of use onward.
+    if (lastKey == null) {
+      await _schedule.setLastCheckDayKey(todayKey);
+      return;
+    }
+
+    DateTime cursor = _parse(lastKey).add(const Duration(days: 1));
 
     var missed = 0;
     String? firstMissedKey;

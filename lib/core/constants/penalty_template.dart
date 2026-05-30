@@ -16,19 +16,24 @@ abstract final class PenaltyTemplate {
     required String issuedDayKey,
     required int missedDays,
   }) {
-    final factor = missedDays.clamp(1, 5);
+    // Keep penalties humane: fixed, modest rep targets with only a gentle set
+    // bump for repeated misses (2 sets for one miss, capped at 4 sets). The EXP
+    // dock is likewise capped so a long absence can't nuke a hunter.
+    final sets = (1 + missedDays).clamp(2, 4);
+    final exp = (penaltyPerMissedDay * missedDays).clamp(-150.0, 0.0);
+
     return PenaltyQuest(
       id: id,
       issuedDayKey: issuedDayKey,
       reason: missedDays > 1
           ? 'Missed $missedDays mandatory days'
           : 'Missed a mandatory day',
-      penaltyApplied: penaltyPerMissedDay * missedDays,
+      penaltyApplied: exp,
       exercises: [
-        ExerciseEntry(name: 'Burpees', targetSets: 3, targetReps: 10 * factor),
-        ExerciseEntry(name: 'Push-ups', targetSets: 3, targetReps: 15 * factor),
-        ExerciseEntry(name: 'Squats', targetSets: 3, targetReps: 20 * factor),
-        ExerciseEntry(name: 'Plank (sec)', targetSets: 3, targetReps: 30 * factor),
+        ExerciseEntry(name: 'Burpees', targetSets: sets, targetReps: 8),
+        ExerciseEntry(name: 'Push-ups', targetSets: sets, targetReps: 12),
+        ExerciseEntry(name: 'Squats', targetSets: sets, targetReps: 15),
+        ExerciseEntry(name: 'Plank (sec)', targetSets: sets, targetReps: 30),
       ],
     );
   }

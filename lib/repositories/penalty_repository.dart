@@ -27,4 +27,12 @@ class PenaltyRepository {
     if (quest == null) return;
     await _box.put(id, quest.copyWith(resolved: true));
   }
+
+  /// Resolve every currently-active penalty (used by the one-time migration
+  /// that clears penalties wrongly issued by the first-run bug).
+  Future<void> resolveAllActive() async {
+    for (final quest in active()) {
+      await _box.put(quest.id, quest.copyWith(resolved: true));
+    }
+  }
 }
