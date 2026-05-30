@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
 import 'dashboard/dashboard_view.dart';
+import 'habits/habits_view.dart';
 import 'world_map/world_map_view.dart';
 
 /// Root navigation shell with a neon bottom bar. Screens still to come
@@ -21,6 +22,7 @@ class _AppShellState extends State<AppShell> {
   static const List<Widget> _pages = [
     DashboardView(),
     WorldMapView(),
+    HabitsView(),
   ];
 
   @override
@@ -44,6 +46,11 @@ class _AppShellState extends State<AppShell> {
               icon: Icon(Icons.map_outlined),
               activeIcon: Icon(Icons.map),
               label: 'Map',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_outline),
+              activeIcon: Icon(Icons.favorite),
+              label: 'Vitality',
             ),
           ],
         ),
