@@ -6,7 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'core/constants/app_strings.dart';
 import 'core/database/database_service.dart';
 import 'core/theme/app_theme.dart';
-import 'views/dashboard/dashboard_view.dart';
+import 'views/app_shell.dart';
 
 /// Entry point for Project Monarch.
 ///
@@ -49,9 +49,8 @@ class MonarchApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       theme: AppTheme.dark,
       darkTheme: AppTheme.dark,
-      // Dashboard is the landing screen. A full go_router shell (map, workout,
-      // nutrition, habits, shop) is wired as those screens land.
-      home: const DashboardView(),
+      // Navigation shell (Status + Map for now; more tabs as screens land).
+      home: const AppShell(),
     );
   }
 }
