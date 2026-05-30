@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../controllers/daily_controller.dart';
 import '../../controllers/providers.dart';
 import '../../controllers/shop_controller.dart';
 import '../../core/constants/app_colors.dart';
 import '../../widgets/consistency_heatmap.dart';
 import '../../widgets/glow_panel.dart';
+import '../../widgets/penalty_banner.dart';
 import '../../widgets/rank_header.dart';
 import '../../widgets/stat_radar_chart.dart';
+import '../active_workout/penalty_quest_view.dart';
+import 'rest_day_sheet.dart';
 
 /// The hunter's status screen: rank/EXP hero, the pentagon stat radar, and the
 /// 365-day consistency heatmap. Everything reads from local Hive via Riverpod.
@@ -22,11 +26,17 @@ class DashboardView extends ConsumerWidget {
     final streak = ref.watch(streakProvider);
     final title = ref.watch(equippedTitleNameProvider);
     final badge = ref.watch(equippedBadgeProvider);
+    final penalties = ref.watch(penaltiesProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('STATUS'),
         actions: [
+          IconButton(
+            tooltip: 'Rest days',
+            icon: const Icon(Icons.event_available),
+            onPressed: () => RestDaySheet.show(context),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: _StreakChip(days: streak),
@@ -43,6 +53,22 @@ class DashboardView extends ConsumerWidget {
               badgeIcon: badge?.icon,
             ),
             const SizedBox(height: 20),
+
+            // --- Penalty quest alert(s) -----------------------------------
+            if (penalties.isNotEmpty) ...[
+              for (final quest in penalties) ...[
+                PenaltyBanner(
+                  quest: quest,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => PenaltyQuestView(quest: quest),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              const SizedBox(height: 8),
+            ],
 
             // --- Attribute radar ------------------------------------------
             GlowPanel(

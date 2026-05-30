@@ -13,6 +13,7 @@ abstract final class HiveBoxes {
   static const String habits = 'box_habits';
   static const String consistency = 'box_consistency';
   static const String nutrition = 'box_nutrition';
+  static const String penalties = 'box_penalties';
   static const String settings = 'box_settings';
 
   // Fixed keys for singleton records.
