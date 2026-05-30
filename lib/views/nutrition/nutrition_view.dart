@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../controllers/nutrition_controller.dart';
 import '../../core/constants/app_colors.dart';
+import '../../models/nutrition_day.dart'; // MacroTargets (serving steps)
 import '../../widgets/glow_panel.dart';
 import '../../widgets/macro_ring.dart';
 

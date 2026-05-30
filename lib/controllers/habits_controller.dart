@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/database/database_service.dart';
-import '../models/consistency_log.dart';
+import '../models/enums.dart'; // DayOutcome
 import '../models/habit.dart';
 import '../repositories/habit_repository.dart';
 import 'providers.dart';
