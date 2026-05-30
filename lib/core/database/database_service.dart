@@ -4,6 +4,7 @@ import '../../models/consistency_log.dart';
 import '../../models/enums.dart';
 import '../../models/exercise_entry.dart';
 import '../../models/habit.dart';
+import '../../models/nutrition_day.dart';
 import '../../models/rank_profile.dart';
 import '../../models/user_stats.dart';
 import '../../models/workout_node.dart';
@@ -46,6 +47,7 @@ abstract final class DatabaseService {
     _safeRegister(ExerciseEntryAdapter());
     _safeRegister(HabitAdapter());
     _safeRegister(ConsistencyLogAdapter());
+    _safeRegister(NutritionDayAdapter());
   }
 
   /// Register an adapter only if its typeId isn't already taken (hot-restart safe).
@@ -62,6 +64,7 @@ abstract final class DatabaseService {
       Hive.openBox<WorkoutNode>(HiveBoxes.workoutNodes),
       Hive.openBox<Habit>(HiveBoxes.habits),
       Hive.openBox<ConsistencyLog>(HiveBoxes.consistency),
+      Hive.openBox<NutritionDay>(HiveBoxes.nutrition),
       Hive.openBox<dynamic>(HiveBoxes.settings),
     ]);
   }
@@ -84,6 +87,9 @@ abstract final class DatabaseService {
   static Box<ConsistencyLog> get consistencyBox =>
       Hive.box<ConsistencyLog>(HiveBoxes.consistency);
 
+  static Box<NutritionDay> get nutritionBox =>
+      Hive.box<NutritionDay>(HiveBoxes.nutrition);
+
   static Box<dynamic> get settingsBox => Hive.box<dynamic>(HiveBoxes.settings);
 
   /// Wipe everything — used by a "reset progress" action / tests.
@@ -94,6 +100,7 @@ abstract final class DatabaseService {
       workoutNodesBox.clear(),
       habitsBox.clear(),
       consistencyBox.clear(),
+      nutritionBox.clear(),
       settingsBox.clear(),
     ]);
   }
