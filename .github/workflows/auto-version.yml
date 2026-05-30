@@ -1,0 +1,118 @@
+name: Auto Version & Release
+
+# Automatically cuts a new version on every push (excluding the bot's own
+# release commits). It bumps pubspec.yaml using Conventional-Commit semantics,
+# commits the bump, tags it, and publishes a GitHub Release with auto-generated
+# notes.
+#
+#   feat: ...         -> minor bump   (0.1.0 -> 0.2.0)
+#   fix: / chore: ... -> patch bump   (0.1.0 -> 0.1.1)
+#   ... with "!" or "BREAKING CHANGE" -> major bump (0.1.0 -> 1.0.0)
+#
+# The build number (the "+N" suffix in pubspec) always increments.
+
+on:
+  push:
+    branches:
+      - main
+      - "claude/**"
+  workflow_dispatch: # allow manual releases from the Actions tab
+
+# Avoid overlapping release runs racing to push/tag.
+concurrency:
+  group: auto-release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # needed to push the bump commit, tag, and create the release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    # Don't loop on the release bump commit this workflow itself creates.
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !startsWith(github.event.head_commit.message, 'chore(release):')"
+
+    steps:
+      - name: Checkout (full history for tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine bump type from commit message
+        id: bump
+        run: |
+          MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $MSG"
+          if echo "$MSG" | grep -qiE "BREAKING CHANGE|!:"; then
+            echo "type=major" >> "$GITHUB_OUTPUT"
+          elif echo "$MSG" | grep -qiE "^feat(\(.+\))?:"; then
+            echo "type=minor" >> "$GITHUB_OUTPUT"
+          else
+            echo "type=patch" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compute next version
+        id: version
+        run: |
+          CURRENT=$(grep '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*//')
+          SEMVER="${CURRENT%%+*}"
+          BUILD="${CURRENT##*+}"
+          # Fall back to build 0 if no "+N" suffix is present.
+          if [ "$BUILD" = "$CURRENT" ]; then BUILD=0; fi
+
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$SEMVER"
+
+          case "${{ steps.bump.outputs.type }}" in
+            major) MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR+1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH+1)) ;;
+          esac
+
+          NEW_BUILD=$((BUILD+1))
+          NEW_SEMVER="${MAJOR}.${MINOR}.${PATCH}"
+          NEW_VERSION="${NEW_SEMVER}+${NEW_BUILD}"
+          TAG="v${NEW_SEMVER}"
+
+          echo "Bumping ${CURRENT} -> ${NEW_VERSION} (${{ steps.bump.outputs.type }})"
+          echo "semver=${NEW_SEMVER}" >> "$GITHUB_OUTPUT"
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Stop if tag already exists
+        id: guard
+        run: |
+          if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Tag ${{ steps.version.outputs.tag }} already exists — skipping release."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Apply version bump to pubspec.yaml
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          sed -i -E "s/^version:.*/version: ${{ steps.version.outputs.version }}/" pubspec.yaml
+          grep '^version:' pubspec.yaml
+
+      - name: Commit, tag & push
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pubspec.yaml
+          git commit -m "chore(release): ${{ steps.version.outputs.tag }} [skip ci]"
+          git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
+          git push origin HEAD:${{ github.ref_name }}
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Create GitHub Release
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            --title "Project Monarch ${{ steps.version.outputs.tag }}" \
+            --generate-notes \
+            --target "${{ github.sha }}"
