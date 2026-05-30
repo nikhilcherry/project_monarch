@@ -105,5 +105,8 @@ Quests** (see `daily_controller.dart`); rest days are configurable.
 
 `.github/workflows/auto-version.yml` auto-versions on every push (Conventional
 Commits): `feat:` → minor, `fix:`/other → patch, `!`/`BREAKING CHANGE` → major.
-It bumps `pubspec.yaml`, tags `vX.Y.Z`, and publishes a GitHub Release. Its own
-release commits are prefixed `chore(release):` + `[skip ci]` to avoid loops.
+It builds a **release APK** (generating the `android/` scaffold + Hive adapters
+in CI first), then bumps `pubspec.yaml`, tags `vX.Y.Z`, and publishes a GitHub
+Release with the APK attached. The build runs *before* tagging, so a failed
+build cuts no release. Its own release commits are prefixed `chore(release):` +
+`[skip ci]` to avoid loops.

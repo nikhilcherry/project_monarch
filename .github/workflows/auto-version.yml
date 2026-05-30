@@ -1,12 +1,13 @@
 name: Auto Version & Release
 
-# Automatically cuts a new version on every push (excluding the bot's own
-# release commits). It bumps pubspec.yaml using Conventional-Commit semantics,
-# commits the bump, tags it, and publishes a GitHub Release with auto-generated
-# notes.
+# On every push (excluding the bot's own release commits) this:
+#   1. Computes the next version from the commit message (Conventional Commits)
+#   2. Builds a release APK  (BEFORE tagging — a failed build cuts no release)
+#   3. Bumps pubspec.yaml, commits, tags vX.Y.Z, pushes
+#   4. Publishes a GitHub Release with the APK attached + auto-generated notes
 #
-#   feat: ...         -> minor bump   (0.1.0 -> 0.2.0)
-#   fix: / chore: ... -> patch bump   (0.1.0 -> 0.1.1)
+#   feat: ...          -> minor bump   (0.1.0 -> 0.2.0)
+#   fix: / chore: ...  -> patch bump   (0.1.0 -> 0.1.1)
 #   ... with "!" or "BREAKING CHANGE" -> major bump (0.1.0 -> 1.0.0)
 #
 # The build number (the "+N" suffix in pubspec) always increments.
@@ -16,15 +17,14 @@ on:
     branches:
       - main
       - "claude/**"
-  workflow_dispatch: # allow manual releases from the Actions tab
+  workflow_dispatch:
 
-# Avoid overlapping release runs racing to push/tag.
 concurrency:
   group: auto-release-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
-  contents: write # needed to push the bump commit, tag, and create the release
+  contents: write
 
 jobs:
   release:
@@ -40,6 +40,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # --- Versioning -------------------------------------------------------
       - name: Determine bump type from commit message
         id: bump
         run: |
@@ -59,36 +60,44 @@ jobs:
           CURRENT=$(grep '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*//')
           SEMVER="${CURRENT%%+*}"
           BUILD="${CURRENT##*+}"
-          # Fall back to build 0 if no "+N" suffix is present.
           if [ "$BUILD" = "$CURRENT" ]; then BUILD=0; fi
-
           IFS='.' read -r MAJOR MINOR PATCH <<< "$SEMVER"
-
           case "${{ steps.bump.outputs.type }}" in
             major) MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0 ;;
             minor) MINOR=$((MINOR+1)); PATCH=0 ;;
             patch) PATCH=$((PATCH+1)) ;;
           esac
-
           NEW_BUILD=$((BUILD+1))
           NEW_SEMVER="${MAJOR}.${MINOR}.${PATCH}"
-          NEW_VERSION="${NEW_SEMVER}+${NEW_BUILD}"
-          TAG="v${NEW_SEMVER}"
-
-          echo "Bumping ${CURRENT} -> ${NEW_VERSION} (${{ steps.bump.outputs.type }})"
+          echo "Bumping ${CURRENT} -> ${NEW_SEMVER}+${NEW_BUILD} (${{ steps.bump.outputs.type }})"
           echo "semver=${NEW_SEMVER}" >> "$GITHUB_OUTPUT"
-          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${NEW_SEMVER}+${NEW_BUILD}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${NEW_SEMVER}" >> "$GITHUB_OUTPUT"
 
       - name: Stop if tag already exists
         id: guard
         run: |
           if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
-            echo "Tag ${{ steps.version.outputs.tag }} already exists — skipping release."
+            echo "Tag ${{ steps.version.outputs.tag }} already exists — skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
+
+      # --- Build (must succeed before we tag/release) -----------------------
+      - name: Set up JDK 17
+        if: steps.guard.outputs.skip == 'false'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        if: steps.guard.outputs.skip == 'false'
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
 
       - name: Apply version bump to pubspec.yaml
         if: steps.guard.outputs.skip == 'false'
@@ -96,18 +105,49 @@ jobs:
           sed -i -E "s/^version:.*/version: ${{ steps.version.outputs.version }}/" pubspec.yaml
           grep '^version:' pubspec.yaml
 
+      - name: Generate Android platform scaffold (if missing)
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          if [ ! -d android ]; then
+            echo "No android/ folder — generating platform scaffold."
+            flutter create --platforms=android --project-name project_monarch .
+          fi
+
+      - name: Install dependencies
+        if: steps.guard.outputs.skip == 'false'
+        run: flutter pub get
+
+      - name: Generate code (Hive adapters, etc.)
+        if: steps.guard.outputs.skip == 'false'
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build release APK
+        if: steps.guard.outputs.skip == 'false'
+        run: flutter build apk --release
+
+      - name: Rename APK
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             "dist/project-monarch-${{ steps.version.outputs.tag }}.apk"
+          ls -lh dist
+
+      # --- Tag & release ----------------------------------------------------
       - name: Commit, tag & push
         if: steps.guard.outputs.skip == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Only commit the version bump (android scaffold/generated files stay
+          # untracked per .gitignore).
           git add pubspec.yaml
           git commit -m "chore(release): ${{ steps.version.outputs.tag }} [skip ci]"
           git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
           git push origin HEAD:${{ github.ref_name }}
           git push origin "${{ steps.version.outputs.tag }}"
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release with APK
         if: steps.guard.outputs.skip == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -115,4 +155,4 @@ jobs:
           gh release create "${{ steps.version.outputs.tag }}" \
             --title "Project Monarch ${{ steps.version.outputs.tag }}" \
             --generate-notes \
-            --target "${{ github.sha }}"
+            "dist/project-monarch-${{ steps.version.outputs.tag }}.apk"
