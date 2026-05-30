@@ -32,7 +32,7 @@ class MapConnectionsPainter extends CustomPainter {
           ..strokeWidth = active ? 3 : 2
           ..strokeCap = StrokeCap.round
           ..color = active
-              ? AppColors.accent.withValues(alpha: 0.9)
+              ? AppColors.accent.withOpacity(0.9)
               : AppColors.border;
 
         if (active) {

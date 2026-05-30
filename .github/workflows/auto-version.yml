@@ -96,6 +96,9 @@ jobs:
         if: steps.guard.outputs.skip == 'false'
         uses: subosito/flutter-action@v2
         with:
+          # Pinned to match the 2024-era dependency + codegen matrix in
+          # pubspec.yaml (Dart 3.5). Keep in sync if deps are bumped.
+          flutter-version: "3.24.5"
           channel: stable
           cache: true
 

@@ -14,7 +14,7 @@ class RewardDialog extends StatelessWidget {
   static Future<void> show(BuildContext context, WorkoutReward reward) {
     return showDialog<void>(
       context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.85),
+      barrierColor: Colors.black.withOpacity(0.85),
       builder: (_) => RewardDialog(reward: reward),
     );
   }
@@ -34,7 +34,7 @@ class RewardDialog extends StatelessWidget {
           border: Border.all(color: AppColors.accent, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: AppColors.accent.withValues(alpha: 0.4),
+              color: AppColors.accent.withOpacity(0.4),
               blurRadius: 40,
               spreadRadius: 2,
             ),
@@ -118,7 +118,7 @@ class _Banner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: color),
       ),
@@ -184,9 +184,9 @@ class _StatGain extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.6)),
+        border: Border.all(color: color.withOpacity(0.6)),
       ),
       child: Text('${type.short} +$amount',
           style: Theme.of(context).textTheme.labelLarge?.copyWith(

@@ -38,15 +38,14 @@ class StatRadarChart extends StatelessWidget {
           radarBorderData:
               const BorderSide(color: AppColors.border, width: 1),
           gridBorderData:
-              BorderSide(color: AppColors.accent.withValues(alpha: 0.15), width: 1),
+              BorderSide(color: AppColors.accent.withOpacity(0.15), width: 1),
           tickBorderData:
-              BorderSide(color: AppColors.accent.withValues(alpha: 0.10), width: 1),
+              BorderSide(color: AppColors.accent.withOpacity(0.10), width: 1),
           radarBackgroundColor: Colors.transparent,
           borderData: FlBorderData(show: false),
           titlePositionPercentageOffset: 0.15,
           getTitle: (index, angle) => RadarChartTitle(
             text: _order[index].short,
-            angle: 0,
           ),
           titleTextStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: AppColors.textPrimary,
@@ -57,7 +56,7 @@ class StatRadarChart extends StatelessWidget {
             RadarDataSet(
               dataEntries:
                   values.map((v) => RadarEntry(value: v)).toList(),
-              fillColor: AppColors.accent.withValues(alpha: 0.22),
+              fillColor: AppColors.accent.withOpacity(0.22),
               borderColor: AppColors.accent,
               borderWidth: 2,
               entryRadius: 3,

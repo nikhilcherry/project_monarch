@@ -135,7 +135,7 @@ class _ShopTile extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColors.surfaceElevated,
-                border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
+                border: Border.all(color: AppColors.accent.withOpacity(0.5)),
               ),
               child: Icon(
                 item.category == ShopCategory.title
@@ -214,7 +214,7 @@ class _Tag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: color),
       ),

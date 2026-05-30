@@ -17,7 +17,7 @@ class SystemWarningDialog extends StatelessWidget {
   static Future<bool> show(BuildContext context, String habitTitle) async {
     final result = await showDialog<bool>(
       context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.85),
+      barrierColor: Colors.black.withOpacity(0.85),
       builder: (_) => SystemWarningDialog(habitTitle: habitTitle),
     );
     return result ?? false;
@@ -37,7 +37,7 @@ class SystemWarningDialog extends StatelessWidget {
           border: Border.all(color: AppColors.warning, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: AppColors.warning.withValues(alpha: 0.35),
+              color: AppColors.warning.withOpacity(0.35),
               blurRadius: 36,
               spreadRadius: 2,
             ),

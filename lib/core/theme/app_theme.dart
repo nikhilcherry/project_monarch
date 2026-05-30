@@ -47,8 +47,8 @@ abstract final class AppTheme {
       textTheme: textTheme,
       primaryColor: AppColors.accent,
       dividerColor: AppColors.border,
-      splashColor: AppColors.accent.withValues(alpha: 0.12),
-      highlightColor: AppColors.accent.withValues(alpha: 0.08),
+      splashColor: AppColors.accent.withOpacity(0.12),
+      highlightColor: AppColors.accent.withOpacity(0.08),
 
       // -----------------------------------------------------------------------
       // App bar — transparent over the void, neon title.
@@ -69,7 +69,7 @@ abstract final class AppTheme {
       // -----------------------------------------------------------------------
       // "System window" panels.
       // -----------------------------------------------------------------------
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: AppColors.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
@@ -146,7 +146,7 @@ abstract final class AppTheme {
         activeTrackColor: AppColors.accent,
         inactiveTrackColor: AppColors.surfaceElevated,
         thumbColor: AppColors.accent,
-        overlayColor: AppColors.accent.withValues(alpha: 0.15),
+        overlayColor: AppColors.accent.withOpacity(0.15),
       ),
       dividerTheme: const DividerThemeData(
         color: AppColors.border,
@@ -168,11 +168,11 @@ abstract final class AppTheme {
         ),
         trackColor: WidgetStateProperty.resolveWith(
           (s) => s.contains(WidgetState.selected)
-              ? AppColors.accent.withValues(alpha: 0.4)
+              ? AppColors.accent.withOpacity(0.4)
               : AppColors.surfaceElevated,
         ),
       ),
-      dialogTheme: DialogThemeData(
+      dialogTheme: DialogTheme(
         backgroundColor: AppColors.surfaceElevated,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(

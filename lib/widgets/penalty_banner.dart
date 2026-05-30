@@ -19,12 +19,12 @@ class PenaltyBanner extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.danger.withValues(alpha: 0.10),
+          color: AppColors.danger.withOpacity(0.10),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.danger, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: AppColors.danger.withValues(alpha: 0.3),
+              color: AppColors.danger.withOpacity(0.3),
               blurRadius: 24,
               spreadRadius: 1,
             ),

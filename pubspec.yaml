@@ -2,7 +2,7 @@ name: project_monarch
 description: "Project Monarch — a gamified, offline-first premium fitness tracker inspired by the System from Solo Leveling."
 publish_to: "none"
 
-# version: <semantic>+<build_number>
+# version: <semantic>+<build_number>  (auto-bumped by the release workflow)
 version: 0.1.0+1
 
 environment:
@@ -13,47 +13,20 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # ---------------------------------------------------------------------------
-  # UI / Icons
-  # ---------------------------------------------------------------------------
+  # UI / Icons / Fonts
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.2.1            # Crisp futuristic typography for the "System" UI
+  google_fonts: ^6.2.1            # Orbitron/Rajdhani HUD typography
 
-  # ---------------------------------------------------------------------------
-  # State Management
-  # Riverpod chosen for compile-safe, testable, granular rebuilds — ideal for
-  # the highly reactive stat/EXP widgets without rebuilding the whole tree.
-  # ---------------------------------------------------------------------------
+  # State Management — Riverpod (manual Notifiers, no codegen)
   flutter_riverpod: ^2.5.1
-  riverpod_annotation: ^2.3.5
 
-  # ---------------------------------------------------------------------------
-  # Routing
-  # ---------------------------------------------------------------------------
-  go_router: ^14.2.0             # Declarative routing for the branching world map flow
-
-  # ---------------------------------------------------------------------------
-  # Local Database (Offline First)
-  # Hive chosen over sqflite: pure-Dart, blazing fast key/value + typed
-  # adapters, zero native setup, perfect for fully offline stat persistence.
-  # ---------------------------------------------------------------------------
+  # Local Database (Offline First) — Hive
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  path_provider: ^2.1.3          # Resolve the app documents dir for the Hive box
 
-  # ---------------------------------------------------------------------------
   # Data Visualization
-  # ---------------------------------------------------------------------------
   fl_chart: ^0.68.0             # Pentagon radar chart (STR/AGI/VIT/END/FLEX)
   flutter_heatmap_calendar: ^1.0.5  # 365-day consistency heatmap grid
-
-  # ---------------------------------------------------------------------------
-  # Utilities
-  # ---------------------------------------------------------------------------
-  intl: ^0.19.0                  # Date formatting for streaks / rest-day logic
-  equatable: ^2.0.5             # Value equality for immutable models
-  freezed_annotation: ^2.4.4    # Immutable model + union/sealed support
-  json_annotation: ^4.9.0       # JSON (de)serialization annotations
 
 dev_dependencies:
   flutter_test:
@@ -61,24 +34,10 @@ dev_dependencies:
 
   flutter_lints: ^4.0.0
 
-  # Codegen toolchain
+  # Codegen — only Hive TypeAdapters are generated.
   build_runner: ^2.4.11
-  hive_generator: ^2.0.1        # Generates Hive TypeAdapters
-  riverpod_generator: ^2.4.0    # Generates Riverpod providers
-  freezed: ^2.5.7               # Generates immutable model boilerplate
-  json_serializable: ^6.8.0     # Generates fromJson/toJson
+  hive_generator: ^2.0.1
 
 flutter:
   uses-material-design: true
-
-  # Asset directories (populated in later phases)
-  assets:
-    - assets/images/
-    - assets/icons/
-    - assets/map/
-
-  # Custom fonts can be registered here later if we move off google_fonts.
-  # fonts:
-  #   - family: Monarch
-  #     fonts:
-  #       - asset: assets/fonts/Monarch-Regular.ttf
+  # No bundled assets yet — declare them here once added under assets/.

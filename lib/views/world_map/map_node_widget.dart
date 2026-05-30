@@ -42,7 +42,7 @@ class MapNodeWidget extends StatelessWidget {
                 boxShadow: style.glow
                     ? [
                         BoxShadow(
-                          color: style.border.withValues(alpha: 0.6),
+                          color: style.border.withOpacity(0.6),
                           blurRadius: 20,
                           spreadRadius: 1,
                         ),

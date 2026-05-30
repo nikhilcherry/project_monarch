@@ -12,9 +12,9 @@ class ConsistencyHeatmap extends StatelessWidget {
 
   // Intensity → glow color ramp (true black base → full neon).
   static final Map<int, Color> _colorsets = {
-    1: AppColors.accent.withValues(alpha: 0.20),
-    2: AppColors.accent.withValues(alpha: 0.40),
-    3: AppColors.accent.withValues(alpha: 0.70),
+    1: AppColors.accent.withOpacity(0.20),
+    2: AppColors.accent.withOpacity(0.40),
+    3: AppColors.accent.withOpacity(0.70),
     4: AppColors.accent,
   };
 

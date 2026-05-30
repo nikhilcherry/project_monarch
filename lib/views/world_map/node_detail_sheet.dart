@@ -170,7 +170,7 @@ class _DifficultyTag extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
+        border: Border.all(color: AppColors.accent.withOpacity(0.5)),
       ),
       child: Text(rank.label,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(

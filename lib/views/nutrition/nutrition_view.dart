@@ -188,8 +188,8 @@ class _RoundIconButton extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: color.withValues(alpha: 0.7), width: 1.5),
-          color: color.withValues(alpha: 0.10),
+          border: Border.all(color: color.withOpacity(0.7), width: 1.5),
+          color: color.withOpacity(0.10),
         ),
         child: Icon(icon, color: color, size: 22),
       ),

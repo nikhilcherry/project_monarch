@@ -102,7 +102,7 @@ class _RankBadge extends StatelessWidget {
         gradient: AppColors.accentGradient,
         boxShadow: [
           BoxShadow(
-            color: AppColors.accent.withValues(alpha: 0.6),
+            color: AppColors.accent.withOpacity(0.6),
             blurRadius: 24,
             spreadRadius: 1,
           ),
@@ -130,7 +130,7 @@ class _CoinPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.coin.withValues(alpha: 0.5)),
+        border: Border.all(color: AppColors.coin.withOpacity(0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -171,7 +171,7 @@ class _ExpBar extends StatelessWidget {
                     gradient: AppColors.accentGradient,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.accent.withValues(alpha: 0.7),
+                        color: AppColors.accent.withOpacity(0.7),
                         blurRadius: 12,
                       ),
                     ],

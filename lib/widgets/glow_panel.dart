@@ -28,10 +28,10 @@ class GlowPanel extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: AppColors.panelGradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.35), width: 1),
+        border: Border.all(color: color.withOpacity(0.35), width: 1),
         boxShadow: [
           BoxShadow(
-            color: color.withValues(alpha: glow ? 0.25 : 0.10),
+            color: color.withOpacity(glow ? 0.25 : 0.10),
             blurRadius: glow ? 28 : 14,
             spreadRadius: glow ? 1 : 0,
           ),

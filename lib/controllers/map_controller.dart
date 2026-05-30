@@ -33,8 +33,12 @@ class WorldMapNotifier extends Notifier<List<WorkoutNode>> {
 
   void _refresh() => state = _repo.getAll();
 
-  WorkoutNode? byId(String id) =>
-      state.where((n) => n.id == id).cast<WorkoutNode?>().firstOrNull;
+  WorkoutNode? byId(String id) {
+    for (final node in state) {
+      if (node.id == id) return node;
+    }
+    return null;
+  }
 
   /// Spend coins to unlock an `unlockable` node.
   Future<UnlockOutcome> unlock(String id) async {

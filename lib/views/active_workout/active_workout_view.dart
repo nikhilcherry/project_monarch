@@ -76,7 +76,7 @@ class _ProgressBar extends StatelessWidget {
               gradient: AppColors.accentGradient,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.accent.withValues(alpha: 0.7),
+                  color: AppColors.accent.withOpacity(0.7),
                   blurRadius: 8,
                 ),
               ],
