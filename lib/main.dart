@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'core/constants/app_colors.dart';
 import 'core/constants/app_strings.dart';
 import 'core/database/database_service.dart';
 import 'core/theme/app_theme.dart';
+import 'views/dashboard/dashboard_view.dart';
 
 /// Entry point for Project Monarch.
 ///
@@ -49,72 +49,9 @@ class MonarchApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       theme: AppTheme.dark,
       darkTheme: AppTheme.dark,
-      // Routing (go_router) is wired in a later phase; a temporary boot screen
-      // confirms the theme/identity is live.
-      home: const _BootScreen(),
-    );
-  }
-}
-
-/// Temporary launch screen proving the neon-on-black identity renders.
-/// Replaced by the Dashboard + go_router shell in Phase 5.
-class _BootScreen extends StatelessWidget {
-  const _BootScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Glowing System sigil placeholder.
-            Container(
-              width: 96,
-              height: 96,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.accent, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.accent.withValues(alpha: 0.5),
-                    blurRadius: 32,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.bolt,
-                color: AppColors.accent,
-                size: 48,
-              ),
-            ),
-            const SizedBox(height: 28),
-            Text(
-              AppStrings.appName,
-              style: textTheme.headlineSmall?.copyWith(
-                letterSpacing: 4,
-                shadows: [
-                  Shadow(
-                    color: AppColors.accent.withValues(alpha: 0.6),
-                    blurRadius: 18,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              AppStrings.tagline,
-              style: textTheme.titleMedium?.copyWith(
-                color: AppColors.accent,
-                letterSpacing: 8,
-              ),
-            ),
-          ],
-        ),
-      ),
+      // Dashboard is the landing screen. A full go_router shell (map, workout,
+      // nutrition, habits, shop) is wired as those screens land.
+      home: const DashboardView(),
     );
   }
 }
