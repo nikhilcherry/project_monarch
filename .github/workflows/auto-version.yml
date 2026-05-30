@@ -25,6 +25,7 @@ concurrency:
 
 permissions:
   contents: write
+  issues: write # so a failed build can report the error log back as an issue
 
 jobs:
   release:
@@ -122,11 +123,17 @@ jobs:
 
       - name: Generate code (Hive adapters, etc.)
         if: steps.guard.outputs.skip == 'false'
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build --delete-conflicting-outputs 2>&1 | tee codegen.log
+
+      - name: Static analysis (non-fatal, for diagnostics)
+        if: steps.guard.outputs.skip == 'false'
+        run: flutter analyze 2>&1 | tee analyze.log || true
 
       - name: Build release APK
         if: steps.guard.outputs.skip == 'false'
-        run: flutter build apk --release
+        run: |
+          set -o pipefail
+          flutter build apk --release 2>&1 | tee build.log
 
       - name: Rename APK
         if: steps.guard.outputs.skip == 'false'
@@ -159,3 +166,34 @@ jobs:
             --title "Project Monarch ${{ steps.version.outputs.tag }}" \
             --generate-notes \
             "dist/project-monarch-${{ steps.version.outputs.tag }}.apk"
+
+      # --- Diagnostics: on ANY failure, report the error log as an issue so it
+      #     can be read without access to the Actions run logs. ---------------
+      - name: Report build failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "Automated build failed for commit \`${{ github.sha }}\` on \`${{ github.ref_name }}\`."
+            echo
+            echo "### flutter build apk (tail)"
+            echo '```'
+            tail -n 150 build.log 2>/dev/null || echo "(no build.log — failed before build)"
+            echo '```'
+            echo "### flutter analyze (tail)"
+            echo '```'
+            tail -n 80 analyze.log 2>/dev/null || echo "(no analyze.log)"
+            echo '```'
+            echo "### build_runner (tail)"
+            echo '```'
+            tail -n 60 codegen.log 2>/dev/null || echo "(no codegen.log)"
+            echo '```'
+          } > _failure_report.md
+          gh issue create \
+            --title "CI build failure @ ${{ github.sha }}" \
+            --body-file _failure_report.md \
+            --label "ci" 2>/dev/null \
+          || gh issue create \
+            --title "CI build failure @ ${{ github.sha }}" \
+            --body-file _failure_report.md

@@ -26,7 +26,8 @@ dependencies:
 
   # Data Visualization
   fl_chart: ^0.68.0             # Pentagon radar chart (STR/AGI/VIT/END/FLEX)
-  flutter_heatmap_calendar: ^1.0.5  # 365-day consistency heatmap grid
+  # (365-day heatmap is hand-painted in widgets/consistency_heatmap.dart —
+  #  no third-party heatmap package needed.)
 
 dev_dependencies:
   flutter_test:
