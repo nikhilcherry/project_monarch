@@ -67,6 +67,20 @@ class WorkoutNode extends HiveObject {
   @HiveField(14)
   int clearCount;
 
+  /// Which branch (Path) this node belongs to: 0=I, 1=II, 2=III, 3=IV.
+  /// -1 for the Rank Gate (it belongs to no single path).
+  @HiveField(15)
+  int pathIndex;
+
+  /// 1-based depth of this node along its path (1 = hub-adjacent entry).
+  @HiveField(16)
+  int depth;
+
+  /// True for the region's capstone Rank Gate. Gates unlock when ANY one of
+  /// their [prerequisiteIds] is cleared (OR), unlike normal nodes (AND).
+  @HiveField(17)
+  bool isGate;
+
   WorkoutNode({
     required this.id,
     required this.title,
@@ -83,6 +97,9 @@ class WorkoutNode extends HiveObject {
     this.x = 0.5,
     this.y = 0.5,
     this.clearCount = 0,
+    this.pathIndex = 0,
+    this.depth = 1,
+    this.isGate = false,
   })  : statRewards = statRewards ?? const {},
         exercises = exercises ?? [],
         prerequisiteIds = prerequisiteIds ?? const [];
@@ -116,6 +133,9 @@ class WorkoutNode extends HiveObject {
     double? x,
     double? y,
     int? clearCount,
+    int? pathIndex,
+    int? depth,
+    bool? isGate,
   }) =>
       WorkoutNode(
         id: id ?? this.id,
@@ -133,6 +153,9 @@ class WorkoutNode extends HiveObject {
         x: x ?? this.x,
         y: y ?? this.y,
         clearCount: clearCount ?? this.clearCount,
+        pathIndex: pathIndex ?? this.pathIndex,
+        depth: depth ?? this.depth,
+        isGate: isGate ?? this.isGate,
       );
 
   @override

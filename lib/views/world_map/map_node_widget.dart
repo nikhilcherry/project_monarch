@@ -27,7 +27,7 @@ class MapNodeWidget extends StatelessWidget {
       onTap: onTap,
       child: SizedBox(
         width: diameter,
-        height: diameter + 26, // room for the title label below
+        height: diameter + 42, // room for a two-line (untruncated) title below
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -55,8 +55,8 @@ class MapNodeWidget extends StatelessWidget {
             Flexible(
               child: Text(
                 node.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                softWrap: true,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: style.glow
@@ -82,9 +82,9 @@ class MapNodeWidget extends StatelessWidget {
           ),
         NodeStatus.unlockable => const _NodeStyle(
             fill: AppColors.surfaceElevated,
-            border: AppColors.coin,
-            icon: Icons.monetization_on,
-            iconColor: AppColors.coin,
+            border: AppColors.crystal,
+            icon: Icons.diamond,
+            iconColor: AppColors.crystal,
             glow: true,
           ),
         NodeStatus.unlocked => const _NodeStyle(

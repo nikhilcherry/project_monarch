@@ -8,7 +8,10 @@ import 'providers.dart';
 
 final workoutNodeRepositoryProvider =
     Provider<WorkoutNodeRepository>((ref) {
-  return WorkoutNodeRepository(DatabaseService.workoutNodesBox);
+  return WorkoutNodeRepository(
+    DatabaseService.workoutNodesBox,
+    DatabaseService.settingsBox,
+  );
 });
 
 /// Outcome of attempting to unlock a node — lets the UI show the right message.
@@ -24,11 +27,16 @@ class WorldMapNotifier extends Notifier<List<WorkoutNode>> {
 
   @override
   List<WorkoutNode> build() {
-    // Seed lazily; the box is already open at this point.
-    final repo = _repo;
-    // Fire-and-forget seed, then read current snapshot.
-    repo.seedIfEmpty();
-    return repo.getAll();
+    // The region tracks the player's current rank: when the rank changes a
+    // fresh, deeper region is generated (and the old one retired — no replay).
+    final rank = ref.watch(rankProfileProvider).rank;
+    _ensure(rank);
+    return _repo.getAll();
+  }
+
+  Future<void> _ensure(Rank rank) async {
+    await _repo.ensureRegion(rank);
+    state = _repo.getAll();
   }
 
   void _refresh() => state = _repo.getAll();

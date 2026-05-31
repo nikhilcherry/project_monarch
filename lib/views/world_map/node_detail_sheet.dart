@@ -147,12 +147,20 @@ class _PrimaryAction extends StatelessWidget {
             label: Text('UNLOCK — ${node.unlockCost} CRYSTALS'),
           ),
         ),
-      NodeStatus.unlocked || NodeStatus.completed => SizedBox(
+      NodeStatus.completed => SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: null,
+            icon: const Icon(Icons.verified),
+            label: const Text('CLEARED'),
+          ),
+        ),
+      NodeStatus.unlocked => SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: onStart,
             icon: const Icon(Icons.play_arrow),
-            label: Text(node.isCompleted ? 'REPLAY DUNGEON' : 'ENTER DUNGEON'),
+            label: const Text('ENTER DUNGEON'),
           ),
         ),
     };
