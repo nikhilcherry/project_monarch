@@ -3,7 +3,7 @@ description: "Project Monarch — a gamified, offline-first premium fitness trac
 publish_to: "none"
 
 # version: <semantic>+<build_number>  (auto-bumped by the release workflow)
-version: 0.2.0+4
+version: 0.3.0+5
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
