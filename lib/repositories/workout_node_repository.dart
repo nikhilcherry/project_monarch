@@ -70,8 +70,9 @@ class WorkoutNodeRepository {
     await _box.put(id, node.copyWith(status: NodeStatus.unlocked));
   }
 
-  /// Mark a node completed and cascade unlocks. Completion is terminal — the UI
-  /// never offers a replay, so this can't be used to farm currency.
+  /// Mark a node completed, lift the fog on its successors, and cascade
+  /// unlocks. Completion is terminal — the UI never offers a replay, so this
+  /// can't be used to farm currency.
   Future<void> markCompleted(String id) async {
     final node = _box.get(id);
     if (node == null) return;
@@ -82,7 +83,17 @@ class WorkoutNodeRepository {
         clearCount: node.clearCount + 1,
       ),
     );
+    await _revealSuccessors(id);
     await recomputeStatuses();
+  }
+
+  /// Reveal every node that lists [id] as a prerequisite (Fog of War lift).
+  Future<void> _revealSuccessors(String id) async {
+    for (final n in _box.values.toList()) {
+      if (!n.revealed && n.prerequisiteIds.contains(id)) {
+        await _box.put(n.id, n.copyWith(revealed: true));
+      }
+    }
   }
 
   /// Force a full regeneration of the current region on next [ensureRegion].

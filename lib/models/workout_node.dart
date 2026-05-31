@@ -81,6 +81,11 @@ class WorkoutNode extends HiveObject {
   @HiveField(17)
   bool isGate;
 
+  /// Fog of War: whether this node has been revealed. Only depth-1 entries are
+  /// revealed at region start; clearing a node reveals its direct successors.
+  @HiveField(18)
+  bool revealed;
+
   WorkoutNode({
     required this.id,
     required this.title,
@@ -100,6 +105,7 @@ class WorkoutNode extends HiveObject {
     this.pathIndex = 0,
     this.depth = 1,
     this.isGate = false,
+    this.revealed = false,
   })  : statRewards = statRewards ?? const {},
         exercises = exercises ?? [],
         prerequisiteIds = prerequisiteIds ?? const [];
@@ -136,6 +142,7 @@ class WorkoutNode extends HiveObject {
     int? pathIndex,
     int? depth,
     bool? isGate,
+    bool? revealed,
   }) =>
       WorkoutNode(
         id: id ?? this.id,
@@ -156,6 +163,7 @@ class WorkoutNode extends HiveObject {
         pathIndex: pathIndex ?? this.pathIndex,
         depth: depth ?? this.depth,
         isGate: isGate ?? this.isGate,
+        revealed: revealed ?? this.revealed,
       );
 
   @override

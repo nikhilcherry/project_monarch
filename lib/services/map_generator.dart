@@ -64,6 +64,7 @@ abstract final class MapGenerator {
             y: y,
             pathIndex: p,
             depth: d,
+            revealed: d == 1, // only the path entries are visible at the start
           ),
         );
         prevId = id;

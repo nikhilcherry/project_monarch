@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
@@ -21,6 +23,8 @@ class MapNodeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!node.revealed) return _FoggedNode(diameter: diameter);
+
     final style = _styleFor(node.status);
 
     return GestureDetector(
@@ -118,4 +122,44 @@ class _NodeStyle {
   final IconData icon;
   final Color iconColor;
   final bool glow;
+}
+
+/// An undiscovered node under the Fog of War — a dim, blurred dot with no label
+/// and no interaction. It hints that the region continues without revealing it.
+class _FoggedNode extends StatelessWidget {
+  const _FoggedNode({required this.diameter});
+
+  final double diameter;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: SizedBox(
+        width: diameter,
+        height: diameter + 42,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+              child: Container(
+                width: diameter * 0.7,
+                height: diameter * 0.7,
+                margin: EdgeInsets.all(diameter * 0.15),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.surfaceElevated.withOpacity(0.6),
+                  border: Border.all(
+                    color: AppColors.textDisabled.withOpacity(0.4),
+                  ),
+                ),
+                child: const Icon(Icons.question_mark,
+                    color: AppColors.textDisabled, size: 18),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

@@ -21,6 +21,10 @@ class MapConnectionsPainter extends CustomPainter {
         final from = byId[prereqId];
         if (from == null) continue;
 
+        // Fog of War: don't draw edges into nodes that haven't been revealed,
+        // so the map visibly unfurls as the player descends a path.
+        if (!node.revealed || !from.revealed) continue;
+
         final p1 = Offset(from.x * size.width, from.y * size.height);
         final p2 = Offset(node.x * size.width, node.y * size.height);
 
