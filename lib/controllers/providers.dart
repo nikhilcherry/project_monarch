@@ -36,35 +36,7 @@ class RankProfileNotifier extends Notifier<RankProfile> {
   ProfileRepository get _repo => ref.read(profileRepositoryProvider);
 
   @override
-  RankProfile build() {
-    final profile = _repo.getOrCreate();
-    // Interim daily Crystal grant (the guaranteed "System Check-In" from the v2
-    // design). Phase 2 will replace this with the full Daily Quest system; for
-    // now it keeps the map playable and honors the soft-lock guarantee:
-    // grant 10·R crystals once per calendar day on app open.
-    _grantDailyCrystalsIfDue();
-    return profile;
-  }
-
-  Future<void> _grantDailyCrystalsIfDue() async {
-    final box = DatabaseService.settingsBox;
-    const key = 'last_crystal_grant_day';
-    final today = _todayKey();
-    if (box.get(key) == today) return; // already granted today
-
-    final profile = _repo.getOrCreate();
-    final grant = 10 * profile.rankFactor; // 10·R
-    await _repo.addCrystals(grant);
-    await box.put(key, today);
-    state = _repo.getOrCreate();
-  }
-
-  static String _todayKey() {
-    final now = DateTime.now();
-    return '${now.year.toString().padLeft(4, '0')}-'
-        '${now.month.toString().padLeft(2, '0')}-'
-        '${now.day.toString().padLeft(2, '0')}';
-  }
+  RankProfile build() => _repo.getOrCreate();
 
   /// Award EXP and surface the result (for LEVEL/RANK UP animations).
   Future<ExpAwardResult> awardExp(double amount) async {
@@ -89,6 +61,12 @@ class RankProfileNotifier extends Notifier<RankProfile> {
     final ok = await _repo.spendCrystals(cost);
     if (ok) state = _repo.getOrCreate();
     return ok;
+  }
+
+  /// Award crystals (Daily Quests — the only crystal source).
+  Future<void> addCrystals(int amount) async {
+    await _repo.addCrystals(amount);
+    state = _repo.getOrCreate();
   }
 }
 

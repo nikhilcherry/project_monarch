@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
+import 'daily/daily_quests_view.dart';
 import 'dashboard/dashboard_view.dart';
 import 'habits/habits_view.dart';
 import 'nutrition/nutrition_view.dart';
@@ -23,6 +24,7 @@ class _AppShellState extends State<AppShell> {
   // IndexedStack keeps each screen's state alive when switching tabs.
   static const List<Widget> _pages = [
     DashboardView(),
+    DailyQuestsView(),
     WorldMapView(),
     HabitsView(),
     NutritionView(),
@@ -45,6 +47,11 @@ class _AppShellState extends State<AppShell> {
               icon: Icon(Icons.dashboard_outlined),
               activeIcon: Icon(Icons.dashboard),
               label: 'Status',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.today_outlined),
+              activeIcon: Icon(Icons.today),
+              label: 'Daily',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.map_outlined),

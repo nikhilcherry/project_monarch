@@ -1,6 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../models/consistency_log.dart';
+import '../../models/daily_quest.dart';
 import '../../models/enums.dart';
 import '../../models/exercise_entry.dart';
 import '../../models/habit.dart';
@@ -50,6 +51,7 @@ abstract final class DatabaseService {
     _safeRegister(ConsistencyLogAdapter());
     _safeRegister(NutritionDayAdapter());
     _safeRegister(PenaltyQuestAdapter());
+    _safeRegister(DailyQuestAdapter());
   }
 
   /// Register an adapter only if its typeId isn't already taken (hot-restart safe).
@@ -68,6 +70,7 @@ abstract final class DatabaseService {
       Hive.openBox<ConsistencyLog>(HiveBoxes.consistency),
       Hive.openBox<NutritionDay>(HiveBoxes.nutrition),
       Hive.openBox<PenaltyQuest>(HiveBoxes.penalties),
+      Hive.openBox<DailyQuest>(HiveBoxes.dailyQuests),
       Hive.openBox<dynamic>(HiveBoxes.settings),
     ]);
   }
@@ -96,6 +99,9 @@ abstract final class DatabaseService {
   static Box<PenaltyQuest> get penaltiesBox =>
       Hive.box<PenaltyQuest>(HiveBoxes.penalties);
 
+  static Box<DailyQuest> get dailyQuestsBox =>
+      Hive.box<DailyQuest>(HiveBoxes.dailyQuests);
+
   static Box<dynamic> get settingsBox => Hive.box<dynamic>(HiveBoxes.settings);
 
   /// Wipe everything — used by a "reset progress" action / tests.
@@ -108,6 +114,7 @@ abstract final class DatabaseService {
       consistencyBox.clear(),
       nutritionBox.clear(),
       penaltiesBox.clear(),
+      dailyQuestsBox.clear(),
       settingsBox.clear(),
     ]);
   }
