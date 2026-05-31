@@ -1,6 +1,11 @@
 name: Auto Version & Release
 
-# On every push (excluding the bot's own release commits) this:
+# RELEASES ARE OPT-IN. This does NOT run on every push — so phase work can be
+# committed freely without cutting a version. It runs only when:
+#   * triggered manually from the Actions tab (workflow_dispatch), OR
+#   * the pushed commit's message contains the marker  [release]
+#
+# When it runs it:
 #   1. Computes the next version from the commit message (Conventional Commits)
 #   2. Builds a release APK  (BEFORE tagging — a failed build cuts no release)
 #   3. Bumps pubspec.yaml, commits, tags vX.Y.Z, pushes
@@ -31,8 +36,13 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
-    # Don't loop on the release bump commit this workflow itself creates.
-    if: "!contains(github.event.head_commit.message, '[skip ci]') && !startsWith(github.event.head_commit.message, 'chore(release):')"
+    # Opt-in only: a manual dispatch, or a push whose commit message contains
+    # "[release]". The bot's own "chore(release):" commit is excluded so it can
+    # never loop.
+    if: >
+      (github.event_name == 'workflow_dispatch' ||
+       contains(github.event.head_commit.message, '[release]')) &&
+      !startsWith(github.event.head_commit.message, 'chore(release):')
 
     steps:
       - name: Checkout (full history for tags)

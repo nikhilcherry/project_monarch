@@ -103,10 +103,16 @@ Quests** (see `daily_controller.dart`); rest days are configurable.
 
 ## CI / Releases
 
-`.github/workflows/auto-version.yml` auto-versions on every push (Conventional
-Commits): `feat:` → minor, `fix:`/other → patch, `!`/`BREAKING CHANGE` → major.
-It builds a **release APK** (generating the `android/` scaffold + Hive adapters
-in CI first), then bumps `pubspec.yaml`, tags `vX.Y.Z`, and publishes a GitHub
-Release with the APK attached. The build runs *before* tagging, so a failed
-build cuts no release. Its own release commits are prefixed `chore(release):` +
-`[skip ci]` to avoid loops.
+`.github/workflows/auto-version.yml` cuts versioned releases — but it is
+**opt-in**, not on every push (so multi-phase work commits freely without
+making versions). It runs only on a manual *Run workflow* (workflow_dispatch)
+**or** when a pushed commit message contains the marker `[release]`. The bump
+follows Conventional Commits: `feat:` → minor, `fix:`/other → patch,
+`!`/`BREAKING CHANGE` → major. When it runs it builds a **release APK**
+(generating the `android/` scaffold + Hive adapters in CI first), then bumps
+`pubspec.yaml`, tags `vX.Y.Z`, and publishes a GitHub Release with the APK
+attached. The build runs *before* tagging, so a failed build cuts no release.
+Its own release commits are prefixed `chore(release):` + `[skip ci]`.
+
+To cut a release: include `[release]` in the commit, or run the workflow
+manually from the Actions tab.
