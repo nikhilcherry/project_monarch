@@ -73,6 +73,7 @@ immutable results the controller persists.
 | 7 | NutritionDay |
 | 8 | PenaltyQuest |
 | 9 | DailyQuest |
+| 10 | ShopRealm |
 | 20–25 | enums (Rank, StatType, NodeStatus, MuscleGroup, HabitCategory, DayOutcome) |
 
 When adding a model: pick the next free typeId, register its adapter in

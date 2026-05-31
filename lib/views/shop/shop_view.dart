@@ -3,10 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../controllers/providers.dart';
 import '../../controllers/shop_controller.dart';
+import '../../controllers/shop_realms_controller.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/shop_catalog.dart';
+import '../../models/enums.dart';
 import '../../models/shop_item.dart';
+import '../../models/shop_realm.dart';
 import '../../widgets/glow_panel.dart';
+import 'realm_view.dart';
 
 /// The cosmetic shop — spend dungeon coins on Hunter titles and badges.
 class ShopView extends ConsumerWidget {
@@ -23,6 +27,8 @@ class ShopView extends ConsumerWidget {
     final badges = ShopCatalog.items
         .where((i) => i.category == ShopCategory.badge)
         .toList();
+    final realms = ref.watch(shopRealmsProvider);
+    final rankTier = ref.watch(rankProfileProvider).rank.tier;
 
     return Scaffold(
       appBar: AppBar(
@@ -68,10 +74,38 @@ class ShopView extends ConsumerWidget {
                   onEquip: () =>
                       ref.read(shopProvider.notifier).equip(item),
                 )),
+            const SizedBox(height: 8),
+            const _SectionHeader('Alternate Realms'),
+            ...realms.map((r) => _RealmTile(
+                  realm: r,
+                  available: r.unlockTier <= rankTier,
+                  onBuy: () => _buyRealm(context, ref, r),
+                  onEnter: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => RealmView(realmId: r.id),
+                    ),
+                  ),
+                )),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _buyRealm(
+      BuildContext context, WidgetRef ref, ShopRealm realm) async {
+    final outcome = await ref.read(shopRealmsProvider.notifier).buy(realm.id);
+    if (!context.mounted) return;
+    final message = switch (outcome) {
+      RealmPurchase.success => 'Unlocked "${realm.name}".',
+      RealmPurchase.alreadyOwned => 'Already unlocked.',
+      RealmPurchase.locked =>
+        'Locked — reach ${Rank.values[realm.unlockTier].label} to unlock.',
+      RealmPurchase.insufficientCoins =>
+        'System Warning: insufficient Coins.',
+    };
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _buy(
@@ -200,6 +234,109 @@ class _ActionButton extends StatelessWidget {
       onPressed: onBuy,
       icon: const Icon(Icons.monetization_on, size: 16),
       label: Text('${item.cost}'),
+    );
+  }
+}
+
+class _RealmTile extends StatelessWidget {
+  const _RealmTile({
+    required this.realm,
+    required this.available,
+    required this.onBuy,
+    required this.onEnter,
+  });
+
+  final ShopRealm realm;
+  final bool available;
+  final VoidCallback onBuy;
+  final VoidCallback onEnter;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final locked = !available && !realm.owned;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GlowPanel(
+        borderColor: realm.owned ? AppColors.accent : AppColors.textDisabled,
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.surfaceElevated,
+                border: Border.all(
+                  color: locked ? AppColors.textDisabled : AppColors.accent,
+                ),
+              ),
+              child: Icon(locked ? Icons.lock : Icons.castle,
+                  color: locked ? AppColors.textDisabled : AppColors.accent,
+                  size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(realm.name, softWrap: true, style: textTheme.titleMedium),
+                  const SizedBox(height: 2),
+                  Text(
+                    realm.owned
+                        ? '${realm.clearedLevels}/${realm.length} levels cleared'
+                        : '${realm.length} levels',
+                    style: textTheme.bodySmall
+                        ?.copyWith(color: AppColors.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            _RealmAction(
+              realm: realm,
+              available: available,
+              onBuy: onBuy,
+              onEnter: onEnter,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RealmAction extends StatelessWidget {
+  const _RealmAction({
+    required this.realm,
+    required this.available,
+    required this.onBuy,
+    required this.onEnter,
+  });
+
+  final ShopRealm realm;
+  final bool available;
+  final VoidCallback onBuy;
+  final VoidCallback onEnter;
+
+  @override
+  Widget build(BuildContext context) {
+    if (realm.owned) {
+      return OutlinedButton(onPressed: onEnter, child: const Text('ENTER'));
+    }
+    if (!available) {
+      return Text('${Rank.values[realm.unlockTier].label}',
+          style: Theme.of(context)
+              .textTheme
+              .labelMedium
+              ?.copyWith(color: AppColors.textDisabled, letterSpacing: 1));
+    }
+    return ElevatedButton.icon(
+      onPressed: onBuy,
+      icon: const Icon(Icons.monetization_on, size: 16),
+      label: Text('${realm.coinCost}'),
     );
   }
 }

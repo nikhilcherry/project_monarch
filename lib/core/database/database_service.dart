@@ -8,6 +8,7 @@ import '../../models/habit.dart';
 import '../../models/nutrition_day.dart';
 import '../../models/penalty_quest.dart';
 import '../../models/rank_profile.dart';
+import '../../models/shop_realm.dart';
 import '../../models/user_stats.dart';
 import '../../models/workout_node.dart';
 import 'hive_boxes.dart';
@@ -52,6 +53,7 @@ abstract final class DatabaseService {
     _safeRegister(NutritionDayAdapter());
     _safeRegister(PenaltyQuestAdapter());
     _safeRegister(DailyQuestAdapter());
+    _safeRegister(ShopRealmAdapter());
   }
 
   /// Register an adapter only if its typeId isn't already taken (hot-restart safe).
@@ -71,6 +73,7 @@ abstract final class DatabaseService {
       Hive.openBox<NutritionDay>(HiveBoxes.nutrition),
       Hive.openBox<PenaltyQuest>(HiveBoxes.penalties),
       Hive.openBox<DailyQuest>(HiveBoxes.dailyQuests),
+      Hive.openBox<ShopRealm>(HiveBoxes.realms),
       Hive.openBox<dynamic>(HiveBoxes.settings),
     ]);
   }
@@ -102,6 +105,8 @@ abstract final class DatabaseService {
   static Box<DailyQuest> get dailyQuestsBox =>
       Hive.box<DailyQuest>(HiveBoxes.dailyQuests);
 
+  static Box<ShopRealm> get realmsBox => Hive.box<ShopRealm>(HiveBoxes.realms);
+
   static Box<dynamic> get settingsBox => Hive.box<dynamic>(HiveBoxes.settings);
 
   /// Wipe everything — used by a "reset progress" action / tests.
@@ -115,6 +120,7 @@ abstract final class DatabaseService {
       nutritionBox.clear(),
       penaltiesBox.clear(),
       dailyQuestsBox.clear(),
+      realmsBox.clear(),
       settingsBox.clear(),
     ]);
   }
