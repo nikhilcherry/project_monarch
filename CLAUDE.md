@@ -30,6 +30,7 @@ If you add or change a `@HiveType` model, re-run `build_runner`.
 ```bash
 flutter test                      # Dart unit tests (lib code)
 python3 scripts/test_math_engine.py   # executable math-engine reference tests
+python3 scripts/test_balance.py       # v2 economy + soft-lock invariant checks
 ```
 
 The Python suite mirrors the Dart engines 1:1 and is the quickest way to verify
