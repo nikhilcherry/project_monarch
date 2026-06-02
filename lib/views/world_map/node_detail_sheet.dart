@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import '../../models/enums.dart';
 import '../../models/workout_node.dart';
 import '../../widgets/glow_panel.dart';
+import '../../widgets/monarch_name.dart';
 
 /// Bottom sheet shown when a node is tapped: title, difficulty, rewards, the
 /// exercise preview, and a context-aware primary action (unlock / start / locked).
@@ -48,7 +49,7 @@ class NodeDetailSheet extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(node.title, style: textTheme.titleLarge),
+                child: MonarchName(node.title, style: textTheme.titleLarge),
               ),
               _DifficultyTag(rank: node.difficulty),
             ],

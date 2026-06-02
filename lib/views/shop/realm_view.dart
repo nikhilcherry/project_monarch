@@ -7,6 +7,7 @@ import '../../models/exercise_entry.dart';
 import '../../models/shop_realm.dart';
 import '../../services/realm_generator.dart';
 import '../../widgets/glow_panel.dart';
+import '../../widgets/monarch_name.dart';
 
 /// A single Shop Realm — a linear gauntlet. Shows progress and the current
 /// level's checklist; clearing it advances to the next level. One-time, no
@@ -70,8 +71,7 @@ class _RealmViewState extends ConsumerState<RealmView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(realm.name,
-                      softWrap: true, style: textTheme.titleLarge),
+                  MonarchName(realm.name, style: textTheme.titleLarge),
                   const SizedBox(height: 4),
                   Text('${realm.clearedLevels} / ${realm.length} levels cleared',
                       style: textTheme.bodySmall

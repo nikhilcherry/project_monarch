@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/enums.dart';
 import '../../models/workout_node.dart';
+import '../../widgets/monarch_name.dart';
 
 /// A single tappable node on the world map. Styling encodes status at a glance:
 /// locked (dim), unlockable (pulsing coin price), unlocked (solid neon),
@@ -57,10 +58,9 @@ class MapNodeWidget extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Flexible(
-              child: Text(
+              child: MonarchName(
                 node.title,
                 maxLines: 2,
-                softWrap: true,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: style.glow

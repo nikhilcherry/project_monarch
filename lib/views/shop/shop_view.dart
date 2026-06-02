@@ -10,6 +10,7 @@ import '../../models/enums.dart';
 import '../../models/shop_item.dart';
 import '../../models/shop_realm.dart';
 import '../../widgets/glow_panel.dart';
+import '../../widgets/monarch_name.dart';
 import 'realm_view.dart';
 
 /// The cosmetic shop — spend dungeon coins on Hunter titles and badges.
@@ -184,7 +185,7 @@ class _ShopTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.name, style: textTheme.titleMedium),
+                  MonarchName(item.name, style: textTheme.titleMedium),
                   const SizedBox(height: 2),
                   Text(item.description,
                       style: textTheme.bodySmall
@@ -282,7 +283,7 @@ class _RealmTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(realm.name, softWrap: true, style: textTheme.titleMedium),
+                  MonarchName(realm.name, style: textTheme.titleMedium),
                   const SizedBox(height: 2),
                   Text(
                     realm.owned

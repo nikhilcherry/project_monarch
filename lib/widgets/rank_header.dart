@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../models/rank_profile.dart';
 import 'glow_panel.dart';
+import 'monarch_name.dart';
 
 /// Top-of-dashboard hero: big rank badge, equipped title/badge, level, the neon
 /// EXP progress bar, and the coin balance.
@@ -46,9 +47,8 @@ class RankHeader extends StatelessWidget {
                           const SizedBox(width: 6),
                         ],
                         Flexible(
-                          child: Text(
+                          child: MonarchName(
                             title,
-                            overflow: TextOverflow.ellipsis,
                             style: textTheme.bodySmall?.copyWith(
                               color: AppColors.accent,
                               letterSpacing: 1.2,
