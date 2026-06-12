@@ -1,0 +1,36 @@
+name: veil
+description: >-
+  Veil — a modern, anonymous topic-board discussion app. A cleaner,
+  better-moderated take on imageboards like 4chan / 2chan.
+publish_to: "none"
+version: 0.1.0+1
+
+# Dart 3.6 / Flutter 3.27+ (uses Color.withValues and CardThemeData).
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management — manual Riverpod Notifiers / providers (no codegen).
+  flutter_riverpod: ^2.5.1
+
+  # Firebase backend (Firestore + Anonymous Auth + Storage).
+  firebase_core: ^3.6.0
+  cloud_firestore: ^5.4.4
+  firebase_auth: ^5.3.1
+  firebase_storage: ^12.3.4
+
+  # Stable per-thread anonymous identity hashing.
+  crypto: ^3.0.5
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

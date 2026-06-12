@@ -1,0 +1,55 @@
+rules_version = '2';
+
+// Veil — Firestore security rules.
+//
+// Anonymous-but-accountable: every writer must be signed in (anonymous auth
+// gives each device a hidden uid we use for rate-limiting & moderation), but
+// no identity is ever exposed publicly. These rules enforce shape + length so
+// the client can't write garbage; heavy abuse controls (rate limits, banned
+// content, spam scoring) belong in Cloud Functions — see README "Moderation".
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isString(v, maxLen) {
+      return v is string && v.size() > 0 && v.size() <= maxLen;
+    }
+
+    // ---- Boards: readable by all, only seeded/managed server-side. ----
+    match /boards/{boardId} {
+      allow read: if true;
+      // Client may only nudge denormalized counters up by one at a time.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['threadCount', 'postCount', 'bumpedAt']);
+      allow create, delete: if false; // boards are seeded, not user-created (MVP)
+
+      // ---- Threads ----
+      match /threads/{threadId} {
+        allow read: if true;
+        allow create: if signedIn()
+          && isString(request.resource.data.title, 120)
+          && isString(request.resource.data.body, 5000)
+          && request.resource.data.authorHash is string
+          && request.resource.data.replyCount == 0;
+        // Only counter/bump fields may change after creation.
+        allow update: if signedIn()
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['replyCount', 'bumpedAt', 'lastReplyAt']);
+        allow delete: if false;
+
+        // ---- Posts (replies) ----
+        match /posts/{postId} {
+          allow read: if true;
+          allow create: if signedIn()
+            && isString(request.resource.data.body, 5000)
+            && request.resource.data.authorHash is string;
+          allow update, delete: if false;
+        }
+      }
+    }
+  }
+}

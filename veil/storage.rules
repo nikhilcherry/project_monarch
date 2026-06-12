@@ -1,0 +1,14 @@
+rules_version = '2';
+
+// Veil — Cloud Storage rules for post images.
+// Signed-in (anonymous) users may upload images up to 8 MB; everyone can read.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /uploads/{boardId}/{threadId}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.resource.size < 8 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}
