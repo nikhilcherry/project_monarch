@@ -20,6 +20,9 @@ dependencies:
   # State Management — Riverpod (manual Notifiers, no codegen)
   flutter_riverpod: ^2.5.1
 
+  # Iterable helpers (firstOrNull) — used by the Lumen module
+  collection: ^1.18.0
+
   # Local Database (Offline First) — Hive
   hive: ^2.2.3
   hive_flutter: ^1.1.0

@@ -100,9 +100,9 @@ class PrefsController extends Notifier<LumenSettings> {
     required int wordsRead,
     required int durationMs,
   }) async {
-    final r = _record
-      ..totalWordsRead += wordsRead
-      ..totalReadMs += durationMs;
+    final r = _record;
+    r.totalWordsRead += wordsRead;
+    r.totalReadMs += durationMs;
     const msPerDay = 86400000;
     final today = DateTime.now().millisecondsSinceEpoch ~/ msPerDay;
     if (r.lastReadDayEpoch != today) {
