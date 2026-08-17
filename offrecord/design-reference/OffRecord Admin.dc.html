@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="_ds/nocturne-f8424fc9-41cf-4e12-b5d3-a8d6c522392d/styles.css">
+<script src="_ds/nocturne-f8424fc9-41cf-4e12-b5d3-a8d6c522392d/_ds_bundle.js"></script>
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+body { margin:0; }
+@keyframes admin-fadein { from { opacity:0; transform:translateY(4px);} to { opacity:1; transform:translateY(0);} }
+:root {
+  --admin-bg: oklch(24% 0.085 25);
+  --admin-glow: oklch(30% 0.095 25);
+  --admin-ghost: oklch(45% 0.11 25);
+  --color-accent: oklch(66% 0.16 45);
+  --color-accent-100: oklch(96% 0.02 45);
+  --color-accent-200: oklch(91% 0.05 45);
+  --color-accent-300: oklch(84% 0.09 45);
+  --color-accent-400: oklch(75% 0.13 45);
+  --color-accent-500: oklch(66% 0.16 45);
+  --color-accent-600: oklch(56% 0.15 45);
+  --color-accent-700: oklch(46% 0.13 45);
+  --color-accent-800: oklch(34% 0.10 45);
+  --color-accent-900: oklch(24% 0.07 45);
+  --color-accent-2: oklch(66% 0.16 45);
+  --color-accent-2-100: oklch(96% 0.02 45);
+  --color-accent-2-200: oklch(91% 0.05 45);
+  --color-accent-2-300: oklch(84% 0.09 45);
+  --color-accent-2-400: oklch(75% 0.13 45);
+  --color-accent-2-500: oklch(66% 0.16 45);
+  --color-accent-2-600: oklch(56% 0.15 45);
+  --color-accent-2-700: oklch(46% 0.13 45);
+  --color-accent-2-800: oklch(34% 0.10 45);
+  --color-accent-2-900: oklch(24% 0.07 45);
+}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:var(--admin-bg);color:var(--color-text);font-family:var(--font-body);">
+
+<header data-screen-label="Admin Header" style="display:flex;align-items:center;gap:12px;padding:16px 28px;background:var(--admin-glow);border-bottom:1px solid var(--admin-ghost);">
+<i class="ph ph-shield-check" style="font-size:20px;color:var(--color-accent-2-100);"></i>
+<div>
+<div style="font-family:var(--font-heading);font-size:16px;">OffRecord Admin</div>
+<div style="font-size:11px;color:var(--color-neutral-300);">Moderation console &mdash; not part of the student experience</div>
+</div>
+</header>
+
+<div style="max-width:1040px;margin:0 auto;padding:28px 24px;display:flex;flex-direction:column;gap:20px;">
+
+<div class="seg" style="align-self:flex-start;">
+<label class="seg-opt"><input type="radio" checked="{{ tabPending }}" onChange="{{ setTabPending }}"/><i class="ph ph-tray"></i>Pending posts{{ pendingCountLabel }}</label>
+<label class="seg-opt"><input type="radio" checked="{{ tabReports }}" onChange="{{ setTabReports }}"/><i class="ph ph-flag"></i>Reports{{ reportCountLabel }}</label>
+</div>
+
+<sc-if value="{{ tabPending }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Pending Posts" style="display:flex;flex-direction:column;gap:12px;animation:admin-fadein .2s ease;">
+<h5 style="margin:0;color:var(--color-neutral-200);">Pending posts</h5>
+<sc-if value="{{ pendingEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="text-align:center;padding:48px 16px;color:var(--color-neutral-400);background:var(--admin-glow);border-radius:var(--radius-lg);">
+<i class="ph ph-check-circle" style="font-size:26px;display:block;margin-bottom:8px;"></i>
+No pending posts. The queue is clear.
+</div>
+</sc-if>
+<sc-for list="{{ pendingPosts }}" as="p" hint-placeholder-count="3">
+<div class="card elev-sm" style="background:var(--admin-glow);gap:10px;">
+<div style="display:flex;align-items:center;gap:8px;">
+<span class="tag {{ p.tagClass }}">{{ p.category }}</span>
+<span style="font-size:12px;color:var(--color-neutral-300);">{{ p.pseudonym }}</span>
+<span style="flex:1;"></span>
+<span style="font-size:11px;color:var(--color-neutral-400);">{{ p.time }}</span>
+</div>
+<p style="margin:0;font-size:14.5px;line-height:1.5;color:var(--color-text);">{{ p.text }}</p>
+<div style="display:flex;gap:8px;">
+<button class="btn btn-primary" onClick="{{ p.onApprove }}"><i class="ph ph-check"></i>Approve</button>
+<button class="btn btn-secondary" onClick="{{ p.onRemove }}"><i class="ph ph-trash"></i>Remove</button>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabReports }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Reports" style="display:flex;flex-direction:column;gap:12px;animation:admin-fadein .2s ease;">
+<h5 style="margin:0;color:var(--color-neutral-200);">Reports</h5>
+<sc-if value="{{ reportsEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="text-align:center;padding:48px 16px;color:var(--color-neutral-400);background:var(--admin-glow);border-radius:var(--radius-lg);">
+<i class="ph ph-check-circle" style="font-size:26px;display:block;margin-bottom:8px;"></i>
+No reports right now.
+</div>
+</sc-if>
+<sc-for list="{{ reports }}" as="r" hint-placeholder-count="3">
+<div class="card elev-sm" style="background:var(--admin-glow);gap:10px;">
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+<span class="tag tag-outline">{{ r.reason }}</span>
+<span style="font-size:12px;color:var(--color-neutral-300);">reported by {{ r.reporter }}</span>
+<span style="flex:1;"></span>
+<span style="font-size:11px;color:var(--color-neutral-400);">{{ r.time }}</span>
+</div>
+<div style="font-size:11px;color:var(--color-neutral-400);text-transform:uppercase;letter-spacing:.06em;">{{ r.contentLabel }} by {{ r.authorPseudonym }}</div>
+<p style="margin:0;font-size:14px;line-height:1.5;color:var(--color-text);background:var(--admin-bg);padding:10px 12px;border-radius:var(--radius-md);">{{ r.contentText }}</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">
+<button class="btn btn-secondary" onClick="{{ r.onDismiss }}"><i class="ph ph-x"></i>Dismiss report</button>
+<button class="btn btn-secondary" onClick="{{ r.onRemoveContent }}"><i class="ph ph-trash"></i>Remove content</button>
+<button class="btn btn-primary" onClick="{{ r.onSuspend }}"><i class="ph ph-user-minus"></i>Suspend user</button>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+</div>
+
+<sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;bottom:24px;left:50%;background:var(--color-surface);box-shadow:var(--shadow-lg);border-radius:999px;padding:10px 18px;display:flex;align-items:center;gap:8px;font-size:13px;transform:translateX(-50%);z-index:600;">
+<i class="ph ph-check-circle" style="color:var(--color-accent);"></i>{{ toast }}
+</div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+class Component extends DCLogic {
+  state = {
+    tab: 'pending', toast: null,
+    pendingPosts: [
+      { id: 'ap1', pseudonym: 'nightowl_04', category: 'Rant', text: "the printers on floor 2 have been down for a week and IT keeps saying 'ticket submitted' like that fixes anything", time: '10m ago' },
+      { id: 'ap2', pseudonym: 'Anonymous', category: 'Confession', text: "I switched majors twice and haven't told my parents yet. it's been four months.", time: '32m ago' },
+      { id: 'ap3', pseudonym: 'sockpuppet22', category: 'Advice', text: "how do people actually make friends in a lecture of 300 people, genuinely asking", time: '1h ago' }
+    ],
+    reports: [
+      { id: 'r1', reason: 'Harassment', reporter: 'Anonymous', kind: 'post', contentLabel: 'Post', authorPseudonym: 'crashcourse_kid', contentText: "you know exactly who you are and everyone in that group chat agrees with me", time: '20m ago' },
+      { id: 'r2', reason: 'Spam', reporter: 'papercut_prophet', kind: 'comment', contentLabel: 'Comment', authorPseudonym: 'dealfinder99', contentText: "check my bio for a huge discount on textbooks!! link in bio!!", time: '48m ago' }
+    ]
+  };
+
+  tagClassFor(cat) {
+    return { Confession: 'tag-accent', Question: 'tag-accent-2', Rant: 'tag-outline', Funny: 'tag-neutral', Advice: 'tag-accent', Other: 'tag-neutral' }[cat] || 'tag-neutral';
+  }
+
+  showToast(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2400); }
+  approvePost(id) { this.setState(s => ({ pendingPosts: s.pendingPosts.filter(p => p.id !== id) })); this.showToast('Post approved and published'); }
+  removePost(id) { this.setState(s => ({ pendingPosts: s.pendingPosts.filter(p => p.id !== id) })); this.showToast('Post removed'); }
+  dismissReport(id) { this.setState(s => ({ reports: s.reports.filter(r => r.id !== id) })); this.showToast('Report dismissed'); }
+  removeContent(id) { this.setState(s => ({ reports: s.reports.filter(r => r.id !== id) })); this.showToast('Content removed'); }
+  suspendUser(id) { this.setState(s => ({ reports: s.reports.filter(r => r.id !== id) })); this.showToast('User suspended'); }
+
+  renderVals() {
+    const s = this.state;
+    const pendingPosts = s.pendingPosts.map(p => ({
+      ...p, tagClass: this.tagClassFor(p.category),
+      onApprove: () => this.approvePost(p.id), onRemove: () => this.removePost(p.id)
+    }));
+    const reports = s.reports.map(r => ({
+      ...r, onDismiss: () => this.dismissReport(r.id), onRemoveContent: () => this.removeContent(r.id), onSuspend: () => this.suspendUser(r.id)
+    }));
+    return {
+      tabPending: s.tab === 'pending', tabReports: s.tab === 'reports',
+      setTabPending: () => this.setState({ tab: 'pending' }), setTabReports: () => this.setState({ tab: 'reports' }),
+      pendingCountLabel: s.pendingPosts.length ? ' (' + s.pendingPosts.length + ')' : '',
+      reportCountLabel: s.reports.length ? ' (' + s.reports.length + ')' : '',
+      pendingPosts, pendingEmpty: pendingPosts.length === 0,
+      reports, reportsEmpty: reports.length === 0,
+      toastVisible: !!s.toast, toast: s.toast
+    };
+  }
+}
+
+</script>
+</body>
+</html>

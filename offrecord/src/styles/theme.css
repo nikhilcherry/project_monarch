@@ -1,0 +1,154 @@
+/* ============================================================================
+   OffRecord — theme tokens
+   ----------------------------------------------------------------------------
+   Two themes only: OLED black (default) and pure white. Every color, space,
+   radius and elevation in the app comes from a token defined here. Never
+   hard-code a hex, a px radius or a shadow in a component.
+
+   Derived from the Nocturne design system, retuned for true black / true
+   white grounds:
+     - Nocturne's ground was #161826, where a drop shadow reads as elevation.
+       On #000000 a shadow is invisible, so elevation here is a hairline
+       border plus a surface lift, and shadows only carry weight on white.
+     - Nocturne's accent ramp was nine hand-picked hexes. Here the whole ramp
+       is derived from ONE brand color (see --brand below) via color-mix, so
+       rebranding is a one-line edit.
+   ========================================================================= */
+
+/* ----------------------------------------------------------------------------
+   THE ONE LINE TO CHANGE TO REBRAND THE ENTIRE APP.
+   Everything accent-colored — buttons, links, tags, focus rings, the active
+   nav item, the reaction heart — is derived from this single value.
+   Pick any reasonably saturated mid-tone; the derivations below pull it
+   lighter on black and darker on white so text contrast holds either way.
+-------------------------------------------------------------------------- */
+:root {
+  --brand: #9184d9;
+}
+
+/* ----------------------------------------------------------------------------
+   Shared, theme-independent tokens
+-------------------------------------------------------------------------- */
+:root {
+  --font-heading: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-body: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* Spacing — Nocturne's 0.7x density scale, rounded to whole pixels so
+     borders and text stay crisp instead of landing on half-pixels. */
+  --space-1: 3px;
+  --space-2: 6px;
+  --space-3: 8px;
+  --space-4: 12px;
+  --space-5: 16px;
+  --space-6: 20px;
+  --space-8: 28px;
+  --space-10: 40px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* Minimum hit area. Many users are on a phone, sometimes a borrowed one —
+     every interactive element clears the 44px accessibility floor. */
+  --tap: 44px;
+
+  --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --shell-max: 1180px;
+  --feed-max: 640px;
+  --sidebar-w: 232px;
+  --rail-w: 288px;
+}
+
+/* ----------------------------------------------------------------------------
+   OLED BLACK (default)
+   True #000000 ground: on an OLED panel those pixels are off, which is both
+   the look you asked for and a real battery saving on phones.
+-------------------------------------------------------------------------- */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg: #000000;
+  /* Raised surfaces step up in tiny increments — on true black, a small lift
+     reads clearly, and staying near-black keeps the OLED benefit. */
+  --color-surface: #0c0c0f;
+  --color-surface-raised: #141418;
+  --color-surface-sunken: #060608;
+
+  --color-text: #f2f2f5;
+  --color-text-muted: #a1a1ab;
+  --color-text-faint: #6e6e78;
+
+  --color-border: rgba(255, 255, 255, 0.11);
+  --color-border-strong: rgba(255, 255, 255, 0.2);
+  --color-divider: rgba(255, 255, 255, 0.08);
+
+  /* Accent: lifted off the brand so it glows against black. */
+  --color-accent: color-mix(in oklab, var(--brand) 88%, white);
+  --color-accent-hover: color-mix(in oklab, var(--brand) 70%, white);
+  /* Body-size accent text needs more lightness than chrome does. */
+  --color-accent-text: color-mix(in oklab, var(--brand) 55%, white);
+  --color-accent-tint: color-mix(in srgb, var(--brand) 14%, transparent);
+  --color-accent-tint-hover: color-mix(in srgb, var(--brand) 22%, transparent);
+  --color-accent-contrast: #08080a;
+
+  --color-danger: #ff6b6b;
+  --color-danger-tint: rgba(255, 107, 107, 0.14);
+  --color-success: #4ade80;
+
+  /* Elevation on black is a border, not a shadow — a shadow would be
+     invisible. The ambient drop is kept only to separate overlays. */
+  --shadow-sm: 0 0 0 1px var(--color-border);
+  --shadow-md: 0 0 0 1px var(--color-border), 0 8px 24px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 0 0 1px var(--color-border-strong), 0 20px 48px rgba(0, 0, 0, 0.85);
+
+  --scrim: rgba(0, 0, 0, 0.72);
+  --skeleton-base: #101014;
+  --skeleton-sheen: #1c1c22;
+}
+
+/* ----------------------------------------------------------------------------
+   PURE WHITE
+-------------------------------------------------------------------------- */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --color-bg: #ffffff;
+  --color-surface: #fafafa;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunken: #f2f2f4;
+
+  --color-text: #0d0d10;
+  --color-text-muted: #5c5c68;
+  --color-text-faint: #8b8b96;
+
+  --color-border: rgba(0, 0, 0, 0.1);
+  --color-border-strong: rgba(0, 0, 0, 0.18);
+  --color-divider: rgba(0, 0, 0, 0.07);
+
+  /* Accent: pushed darker so it holds contrast on white. */
+  --color-accent: color-mix(in oklab, var(--brand) 78%, black);
+  --color-accent-hover: color-mix(in oklab, var(--brand) 62%, black);
+  --color-accent-text: color-mix(in oklab, var(--brand) 62%, black);
+  --color-accent-tint: color-mix(in srgb, var(--brand) 12%, transparent);
+  --color-accent-tint-hover: color-mix(in srgb, var(--brand) 20%, transparent);
+  --color-accent-contrast: #ffffff;
+
+  --color-danger: #d92d20;
+  --color-danger-tint: rgba(217, 45, 32, 0.1);
+  --color-success: #15803d;
+
+  /* On white, real ink shadows do the work. */
+  --shadow-sm: 0 0 0 1px var(--color-border);
+  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.06), 0 20px 48px rgba(0, 0, 0, 0.14);
+
+  --scrim: rgba(20, 20, 24, 0.4);
+  --skeleton-base: #eeeef1;
+  --skeleton-sheen: #f8f8fa;
+}

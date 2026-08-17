@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="_ds/nocturne-f8424fc9-41cf-4e12-b5d3-a8d6c522392d/styles.css">
+<script src="_ds/nocturne-f8424fc9-41cf-4e12-b5d3-a8d6c522392d/_ds_bundle.js"></script>
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+@keyframes offrecord-fadein { from { opacity:0; transform:translateY(4px);} to { opacity:1; transform:translateY(0);} }
+@keyframes offrecord-toastin { from { opacity:0; transform:translate(-50%,8px);} to { opacity:1; transform:translate(-50%,0);} }
+@keyframes offrecord-shimmer { 0% { background-position:-200px 0; } 100% { background-position:200px 0; } }
+body { margin:0; }
+a { color: var(--color-accent); }
+a:hover { color: var(--color-accent-300); }
+</style>
+</helmet>
+
+<div style="{{ pageWrapStyle }}">
+
+<div style="{{ deviceToggleStyle }}">
+<span style="font-size:10px;color:var(--color-neutral-500);letter-spacing:.04em;text-transform:uppercase;margin-right:4px;">Preview</span>
+<div class="seg">
+<label class="seg-opt"><input type="radio" checked="{{ isMobile }}" onChange="{{ setMobile }}"/><i class="ph ph-device-mobile"></i></label>
+<label class="seg-opt"><input type="radio" checked="{{ isDesktop }}" onChange="{{ setDesktop }}"/><i class="ph ph-desktop"></i></label>
+</div>
+</div>
+
+<sc-if value="{{ showOnboarding }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Onboarding" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;animation:offrecord-fadein .3s ease;">
+<div style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:20px;text-align:center;">
+<div>
+<div style="font-family:var(--font-heading);font-weight:500;font-size:26px;color:var(--color-text);">OffRecord</div>
+<div style="font-size:13px;color:var(--color-neutral-500);margin-top:4px;">An anonymous space to say what's actually on your mind.</div>
+</div>
+<div class="card elev-sm" style="text-align:left;">
+<div class="field">
+<label>Invite code</label>
+<input class="input" type="text" placeholder="e.g. OFFR-XXXX" value="{{ inviteInput }}" onChange="{{ updateInviteInput }}"/>
+</div>
+<button class="btn btn-primary btn-block" onClick="{{ submitInvite }}">Join OffRecord</button>
+<div style="font-size:11px;color:var(--color-neutral-600);margin-top:10px;">Invite-only for now. Every account here is a pseudonym &mdash; no real names, ever.</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showApp }}" hint-placeholder-val="{{ true }}">
+<div style="{{ shellStyle }}">
+
+<sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ false }}">
+<nav data-screen-label="Sidebar" style="display:flex;flex-direction:column;gap:4px;padding:20px 10px;">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:0 8px 16px;">
+<span class="nav-brand" style="margin-right:0;">OffRecord</span>
+<button class="btn btn-icon btn-ghost" onClick="{{ toggleNotif }}" aria-label="Notifications"><i class="ph ph-bell"></i></button>
+</div>
+<button style="{{ navBtnStyleD.home }}" onClick="{{ navHome }}"><i class="ph {{ homeIcon }}"></i>Home</button>
+<button style="{{ navBtnStyleD.trending }}" onClick="{{ navTrending }}"><i class="ph {{ trendingIcon }}"></i>Trending</button>
+<button style="{{ navBtnStyleD.latest }}" onClick="{{ navLatest }}"><i class="ph {{ latestIcon }}"></i>Latest</button>
+<button style="{{ navBtnStyleD.search }}" onClick="{{ navSearch }}"><i class="ph {{ searchIcon }}"></i>Search</button>
+<button style="{{ navBtnStyleD.profile }}" onClick="{{ navProfile }}"><i class="ph {{ profileIcon }}"></i>Profile</button>
+<button style="{{ navBtnStyleD.settings }}" onClick="{{ navSettings }}"><i class="ph {{ settingsIcon }}"></i>Settings</button>
+<div class="hr"></div>
+<button class="btn btn-primary btn-block" onClick="{{ navCreate }}"><i class="ph ph-plus-circle"></i>New post</button>
+<div style="flex:1;"></div>
+<div style="display:flex;align-items:center;gap:10px;padding:10px 8px;border-top:1px solid var(--color-divider);margin-top:12px;">
+<div style="{{ avatarStyle }}">{{ userInitials }}</div>
+<div style="display:flex;flex-direction:column;overflow:hidden;">
+<span style="font-size:13px;color:var(--color-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ currentUser.pseudonym }}</span>
+<span style="font-size:11px;color:var(--color-neutral-600);">View profile</span>
+</div>
+</div>
+</nav>
+</sc-if>
+
+<sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+<header data-screen-label="Header" style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--color-divider);position:relative;">
+<span class="nav-brand">OffRecord</span>
+<button class="btn btn-icon btn-ghost" onClick="{{ toggleNotif }}" aria-label="Notifications"><i class="ph ph-bell"></i></button>
+</header>
+</sc-if>
+
+<main style="{{ mainStyle }}">
+
+<sc-if value="{{ notifOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;top:60px;right:20px;width:280px;background:var(--color-surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:14px;z-index:200;animation:offrecord-fadein .15s ease;">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+<span style="font-family:var(--font-heading);font-size:14px;">Notifications</span>
+<button class="btn btn-icon btn-ghost" onClick="{{ toggleNotif }}"><i class="ph ph-x"></i></button>
+</div>
+<div style="text-align:center;padding:20px 8px;color:var(--color-neutral-600);font-size:12.5px;">
+<i class="ph ph-bell-slash" style="font-size:22px;display:block;margin-bottom:6px;"></i>
+No notifications yet &mdash; you're all caught up.
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ routeIsHome }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Home Feed" style="display:flex;flex-direction:column;gap:14px;animation:offrecord-fadein .25s ease;">
+
+<sc-if value="{{ showConnectionBanner }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:8px;background:var(--color-accent-900);border:1px solid var(--color-accent-700);border-radius:var(--radius-md);padding:8px 12px;font-size:12.5px;color:var(--color-accent-200);">
+<i class="ph ph-wifi-slash"></i>
+<span style="flex:1;">Trouble reaching OffRecord. Some posts may be out of date.</span>
+<button class="btn btn-ghost" style="font-size:12px;padding:2px 8px;" onClick="{{ retryConnection }}">Retry</button>
+<button class="btn btn-icon btn-ghost" style="width:24px;height:24px;" onClick="{{ dismissConnectionBanner }}"><i class="ph ph-x"></i></button>
+</div>
+</sc-if>
+
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+<h4 style="margin:0;">{{ feedHeading }}</h4>
+<div class="seg">
+<label class="seg-opt"><input type="radio" checked="{{ sortTrending }}" onChange="{{ setSortTrending }}"/>Trending</label>
+<label class="seg-opt"><input type="radio" checked="{{ sortLatest }}" onChange="{{ setSortLatest }}"/>Latest</label>
+<label class="seg-opt"><input type="radio" checked="{{ sortDiscussed }}" onChange="{{ setSortDiscussed }}"/>Discussed</label>
+</div>
+</div>
+
+<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;">
+<sc-for list="{{ filterCategories }}" as="cat" hint-placeholder-count="7">
+<button style="{{ cat.style }}" onClick="{{ cat.onClick }}">{{ cat.name }}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px;">
+<sc-for list="{{ skeletonRows }}" as="row" hint-placeholder-count="3">
+<div class="card" style="gap:10px;">
+<div style="{{ row.line1 }}"></div>
+<div style="{{ row.line2 }}"></div>
+<div style="{{ row.line3 }}"></div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ feedEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:48px 16px;color:var(--color-neutral-500);">
+<i class="ph ph-chat-teardrop-text" style="font-size:32px;"></i>
+<div style="font-family:var(--font-heading);font-size:16px;color:var(--color-text);">No posts here yet</div>
+<div style="font-size:13px;max-width:280px;">Nothing in {{ activeCategory }} right now. Be the first to share something.</div>
+<button class="btn btn-primary" onClick="{{ navCreate }}">Create a post</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ showFeedList }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px;">
+<sc-for list="{{ feedPosts }}" as="post" hint-placeholder-count="4">
+<div class="card elev-sm" style="position:relative;gap:8px;">
+<div style="display:flex;align-items:center;gap:8px;">
+<span class="tag {{ post.tagClass }}">{{ post.category }}</span>
+<sc-if value="{{ post.pendingBadge }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Pending review</span></sc-if>
+<span style="flex:1;"></span>
+<span style="font-size:11px;color:var(--color-neutral-600);">{{ post.time }}</span>
+<button class="btn btn-icon btn-ghost" style="width:28px;height:28px;" onClick="{{ post.onToggleMenu }}"><i class="ph ph-dots-three"></i></button>
+<sc-if value="{{ post.showMoreMenu }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;top:36px;right:8px;background:var(--color-surface);box-shadow:var(--shadow-md);border-radius:var(--radius-md);padding:4px;z-index:20;">
+<button class="btn btn-ghost" style="width:100%;justify-content:flex-start;color:var(--color-text);" onClick="{{ post.onReport }}"><i class="ph ph-flag"></i>Report post</button>
+</div>
+</sc-if>
+</div>
+<div style="font-size:12px;color:var(--color-neutral-500);">{{ post.pseudonym }}</div>
+<p style="margin:0;font-size:14.5px;color:var(--color-text);cursor:pointer;line-height:1.5;" onClick="{{ post.onOpen }}">{{ post.excerpt }}</p>
+<div style="display:flex;align-items:center;gap:16px;margin-top:2px;">
+<button style="{{ post.reactBtnStyle }}" onClick="{{ post.onReact }}"><i class="ph {{ post.reactIcon }}"></i>{{ post.reactions }}</button>
+<button style="{{ commentBtnStyle }}" onClick="{{ post.onOpen }}"><i class="ph ph-chat-circle"></i>{{ post.commentCount }}</button>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ routeIsSearch }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Search" style="display:flex;flex-direction:column;gap:14px;animation:offrecord-fadein .25s ease;">
+<h4 style="margin:0;">Search</h4>
+<div class="field">
+<input class="input" type="text" placeholder="Search posts, categories, or usernames" value="{{ searchQuery }}" onChange="{{ updateSearchQuery }}"/>
+</div>
+<sc-if value="{{ searchHasQuery }}" hint-placeholder-val="{{ false }}">
+<sc-if value="{{ searchEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:40px 16px;color:var(--color-neutral-500);">
+<i class="ph ph-magnifying-glass" style="font-size:28px;"></i>
+<div style="font-family:var(--font-heading);font-size:15px;color:var(--color-text);">No results for &ldquo;{{ searchQuery }}&rdquo;</div>
+<div style="font-size:13px;">Try a different word, category, or pseudonym.</div>
+</div>
+</sc-if>
+<sc-if value="{{ searchHasResults }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px;">
+<sc-for list="{{ searchResults }}" as="post" hint-placeholder-count="3">
+<div class="card elev-sm" style="gap:8px;">
+<div style="display:flex;align-items:center;gap:8px;">
+<span class="tag {{ post.tagClass }}">{{ post.category }}</span>
+<span style="flex:1;"></span>
+<span style="font-size:11px;color:var(--color-neutral-600);">{{ post.time }}</span>
+</div>
+<div style="font-size:12px;color:var(--color-neutral-500);">{{ post.pseudonym }}</div>
+<p style="margin:0;font-size:14.5px;color:var(--color-text);cursor:pointer;line-height:1.5;" onClick="{{ post.onOpen }}">{{ post.excerpt }}</p>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</sc-if>
+<sc-if value="{{ searchNoQuery }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:10px;">
+<div style="font-size:12px;color:var(--color-neutral-600);">Try searching:</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">
+<sc-for list="{{ searchSuggestions }}" as="s" hint-placeholder-count="4">
+<button class="tag tag-neutral" style="cursor:pointer;border:none;" onClick="{{ s.onClick }}">{{ s.label }}</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ routeIsCreate }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Create Post" style="display:flex;flex-direction:column;gap:16px;animation:offrecord-fadein .25s ease;max-width:520px;">
+<h4 style="margin:0;">Create a post</h4>
+<div style="font-size:12.5px;color:var(--color-neutral-500);background:var(--color-surface);border-radius:var(--radius-md);padding:10px 12px;display:flex;gap:8px;align-items:flex-start;">
+<i class="ph ph-shield-check" style="margin-top:1px;"></i>
+<span>Posts are reviewed before they appear publicly. Keep it real, keep it kind.</span>
+</div>
+<div class="field">
+<label>Category</label>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">
+<sc-for list="{{ composerCategoryChips }}" as="cat" hint-placeholder-count="6">
+<button style="{{ cat.style }}" onClick="{{ cat.onClick }}">{{ cat.name }}</button>
+</sc-for>
+</div>
+</div>
+<div class="field">
+<label>What's on your mind?</label>
+<textarea class="input" rows="6" placeholder="Share a confession, ask a question, vent a little..." value="{{ composerText }}" onChange="{{ updateComposerText }}"></textarea>
+<div style="display:flex;justify-content:flex-end;margin-top:4px;">
+<span style="font-size:11px;color:{{ composerCounterColor }};">{{ composerCharCount }}/500</span>
+</div>
+</div>
+<div class="field">
+<label>Post as</label>
+<div style="display:flex;flex-direction:column;gap:8px;">
+<label class="radio"><input type="radio" checked="{{ composerAnon }}" onChange="{{ setComposerAnonTrue }}"/><span class="dot"></span>Anonymous</label>
+<label class="radio"><input type="radio" checked="{{ composerNotAnon }}" onChange="{{ setComposerAnonFalse }}"/><span class="dot"></span>{{ currentUser.pseudonym }} (pseudonym)</label>
+</div>
+</div>
+<button class="btn btn-primary btn-block" disabled="{{ composerDisabled }}" onClick="{{ submitComposer }}">Submit for review</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ routeIsPost }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Post Detail" style="display:flex;flex-direction:column;gap:16px;animation:offrecord-fadein .25s ease;max-width:560px;">
+<button class="btn btn-ghost" style="align-self:flex-start;padding:0;" onClick="{{ navHome }}"><i class="ph ph-caret-left"></i>Back</button>
+
+<sc-if value="{{ postLoading }}" hint-placeholder-val="{{ false }}">
+<div class="card" style="gap:10px;">
+<div style="width:40%;height:12px;border-radius:4px;background:linear-gradient(90deg,var(--color-neutral-800) 25%,var(--color-neutral-700) 37%,var(--color-neutral-800) 63%);background-size:400px 100%;animation:offrecord-shimmer 1.4s infinite;"></div>
+<div style="width:90%;height:12px;border-radius:4px;background:linear-gradient(90deg,var(--color-neutral-800) 25%,var(--color-neutral-700) 37%,var(--color-neutral-800) 63%);background-size:400px 100%;animation:offrecord-shimmer 1.4s infinite;"></div>
+<div style="width:70%;height:12px;border-radius:4px;background:linear-gradient(90deg,var(--color-neutral-800) 25%,var(--color-neutral-700) 37%,var(--color-neutral-800) 63%);background-size:400px 100%;animation:offrecord-shimmer 1.4s infinite;"></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ postReady }}" hint-placeholder-val="{{ false }}">
+<div class="card elev-sm" style="gap:10px;position:relative;">
+<div style="display:flex;align-items:center;gap:8px;">
+<span class="tag {{ selectedPost.tagClass }}">{{ selectedPost.category }}</span>
+<span style="flex:1;"></span>
+<span style="font-size:11px;color:var(--color-neutral-600);">{{ selectedPost.time }}</span>
+<button class="btn btn-icon btn-ghost" style="width:28px;height:28px;" onClick="{{ togglePostMenu }}"><i class="ph ph-dots-three"></i></button>
+<sc-if value="{{ postMenuOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;top:36px;right:8px;background:var(--color-surface);box-shadow:var(--shadow-md);border-radius:var(--radius-md);padding:4px;z-index:20;">
+<button class="btn btn-ghost" style="width:100%;justify-content:flex-start;color:var(--color-text);" onClick="{{ reportSelectedPost }}"><i class="ph ph-flag"></i>Report post</button>
+</div>
+</sc-if>
+</div>
+<div style="font-size:12.5px;color:var(--color-neutral-500);">{{ selectedPost.pseudonym }}</div>
+<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--color-text);">{{ selectedPost.text }}</p>
+<div style="display:flex;align-items:center;gap:16px;margin-top:2px;">
+<button style="{{ selectedPost.reactBtnStyle }}" onClick="{{ selectedPost.onReact }}"><i class="ph {{ selectedPost.reactIcon }}"></i>{{ selectedPost.reactions }}</button>
+<span style="{{ commentBtnStyle }}"><i class="ph ph-chat-circle"></i>{{ selectedPost.commentCount }}</span>
+</div>
+</div>
+
+<div class="hr"></div>
+<h5 style="margin:0;">Comments ({{ postComments.length }})</h5>
+
+<sc-if value="{{ commentsEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="text-align:center;padding:24px 8px;color:var(--color-neutral-600);font-size:13px;">No comments yet. Start the conversation.</div>
+</sc-if>
+
+<div style="display:flex;flex-direction:column;gap:10px;">
+<sc-for list="{{ postComments }}" as="c" hint-placeholder-count="2">
+<div class="card" style="gap:6px;position:relative;">
+<div style="display:flex;align-items:center;gap:8px;">
+<span style="font-size:12.5px;color:var(--color-neutral-400);">{{ c.pseudonym }}</span>
+<span style="flex:1;"></span>
+<button class="btn btn-icon btn-ghost" style="width:24px;height:24px;" onClick="{{ c.onToggleMenu }}"><i class="ph ph-dots-three"></i></button>
+<sc-if value="{{ c.showMenu }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;top:28px;right:0;background:var(--color-surface);box-shadow:var(--shadow-md);border-radius:var(--radius-md);padding:4px;z-index:20;">
+<button class="btn btn-ghost" style="width:100%;justify-content:flex-start;color:var(--color-text);" onClick="{{ c.onReport }}"><i class="ph ph-flag"></i>Report comment</button>
+</div>
+</sc-if>
+</div>
+<p style="margin:0;font-size:14px;color:var(--color-text);line-height:1.5;">{{ c.text }}</p>
+<button style="{{ c.reactBtnStyle }}" onClick="{{ c.onReact }}"><i class="ph {{ c.reactIcon }}"></i>{{ c.reactions }}</button>
+</div>
+</sc-for>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:6px;">
+<div style="display:flex;gap:8px;">
+<input class="input" type="text" placeholder="Add a comment..." value="{{ commentDraft }}" onChange="{{ updateCommentDraft }}"/>
+<button class="btn btn-primary" onClick="{{ submitComment }}">Post</button>
+</div>
+<sc-if value="{{ hasCommentError }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:var(--color-accent-300);">{{ commentError }}</span></sc-if>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ routeIsProfile }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Profile" style="display:flex;flex-direction:column;gap:18px;animation:offrecord-fadein .25s ease;max-width:520px;">
+<div style="display:flex;align-items:center;gap:14px;">
+<div style="{{ avatarStyleLg }}">{{ userInitials }}</div>
+<div>
+<div style="font-family:var(--font-heading);font-size:19px;">{{ currentUser.pseudonym }}</div>
+<div style="font-size:12.5px;color:var(--color-neutral-500);">Joined {{ currentUser.joinDate }} &middot; {{ profilePostCount }} posts</div>
+</div>
+</div>
+
+<div class="hr"></div>
+<div>
+<h5 style="margin:0 0 10px;">Your invite codes</h5>
+<div style="display:flex;flex-direction:column;gap:6px;">
+<sc-for list="{{ inviteCodeRows }}" as="ic" hint-placeholder-count="3">
+<div class="card" style="flex-direction:row;align-items:center;justify-content:space-between;padding:10px 12px;">
+<span style="font-family:ui-monospace,monospace;font-size:13px;color:var(--color-accent-300);">{{ ic.code }}</span>
+<button class="btn btn-icon btn-ghost" onClick="{{ ic.onCopy }}"><i class="ph ph-copy"></i></button>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div class="hr"></div>
+<div>
+<h5 style="margin:0 0 10px;">Your posts</h5>
+<sc-if value="{{ profileEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="text-align:center;padding:24px 8px;color:var(--color-neutral-600);font-size:13px;">You haven't posted yet. Your public posts will show up here.</div>
+</sc-if>
+<div style="display:flex;flex-direction:column;gap:10px;">
+<sc-for list="{{ profilePosts }}" as="post" hint-placeholder-count="1">
+<div class="card elev-sm" style="gap:8px;">
+<div style="display:flex;align-items:center;gap:8px;">
+<span class="tag {{ post.tagClass }}">{{ post.category }}</span>
+<span style="flex:1;"></span>
+<span style="font-size:11px;color:var(--color-neutral-600);">{{ post.time }}</span>
+</div>
+<p style="margin:0;font-size:14.5px;color:var(--color-text);cursor:pointer;line-height:1.5;" onClick="{{ post.onOpen }}">{{ post.excerpt }}</p>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ routeIsSettings }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Settings" style="display:flex;flex-direction:column;gap:20px;animation:offrecord-fadein .25s ease;max-width:480px;">
+<h4 style="margin:0;">Settings</h4>
+
+<div>
+<h6 style="color:var(--color-neutral-500);margin:0 0 8px;">Notifications</h6>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--color-divider);">
+<span style="font-size:14px;">Replies to your posts</span>
+<div style="{{ notifRepliesTrack }}" onClick="{{ toggleNotifReplies }}"><div style="{{ notifRepliesKnob }}"></div></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+<span style="font-size:14px;">Weekly digest</span>
+<div style="{{ notifDigestTrack }}" onClick="{{ toggleNotifDigest }}"><div style="{{ notifDigestKnob }}"></div></div>
+</div>
+</div>
+
+<div>
+<h6 style="color:var(--color-neutral-500);margin:0 0 8px;">Privacy</h6>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+<span style="font-size:14px;">Post anonymously by default</span>
+<div style="{{ defaultAnonTrack }}" onClick="{{ toggleDefaultAnon }}"><div style="{{ defaultAnonKnob }}"></div></div>
+</div>
+</div>
+
+<div>
+<h6 style="color:var(--color-neutral-500);margin:0 0 8px;">About</h6>
+<div style="display:flex;flex-direction:column;gap:8px;font-size:14px;">
+<a href="#">Community guidelines</a>
+<a href="#">Report a bug</a>
+</div>
+</div>
+
+<div class="hr"></div>
+<button class="btn btn-secondary" onClick="{{ logout }}"><i class="ph ph-sign-out"></i>Log out</button>
+</div>
+</sc-if>
+
+</main>
+
+<sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ false }}">
+<aside data-screen-label="Trending Sidebar" style="display:flex;flex-direction:column;gap:16px;padding:20px 8px;">
+<div>
+<h6 style="color:var(--color-neutral-500);margin:0 0 10px;">Trending now</h6>
+<div style="display:flex;flex-direction:column;gap:8px;">
+<sc-for list="{{ trendingPreview }}" as="tp" hint-placeholder-count="3">
+<div class="card" style="gap:4px;cursor:pointer;" onClick="{{ tp.onOpen }}">
+<span class="tag {{ tp.tagClass }}" style="align-self:flex-start;">{{ tp.category }}</span>
+<span style="font-size:13px;color:var(--color-text);line-height:1.4;">{{ tp.excerpt }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<div>
+<h6 style="color:var(--color-neutral-500);margin:0 0 10px;">Categories</h6>
+<div style="display:flex;flex-direction:column;gap:2px;">
+<sc-for list="{{ sidebarCategories }}" as="cat" hint-placeholder-count="6">
+<button style="{{ cat.sidebarStyle }}" onClick="{{ cat.onClick }}">{{ cat.name }}</button>
+</sc-for>
+</div>
+</div>
+</aside>
+</sc-if>
+
+<sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+<nav data-screen-label="Bottom Nav" style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-around;padding:4px 8px 10px;border-top:1px solid var(--color-divider);background:var(--color-surface);position:relative;">
+<button style="{{ mobileNavStyle.home }}" onClick="{{ navHome }}"><i class="ph {{ homeIcon }}" style="font-size:20px;"></i>Home</button>
+<button style="{{ mobileNavStyle.search }}" onClick="{{ navSearch }}"><i class="ph {{ searchIcon }}" style="font-size:20px;"></i>Search</button>
+<button style="{{ fabStyle }}" onClick="{{ navCreate }}" aria-label="Create post"><i class="ph ph-plus" style="font-size:24px;"></i></button>
+<button style="{{ mobileNavStyle.profile }}" onClick="{{ navProfile }}"><i class="ph {{ profileIcon }}" style="font-size:20px;"></i>Profile</button>
+<button style="{{ mobileNavStyle.settings }}" onClick="{{ navSettings }}"><i class="ph {{ settingsIcon }}" style="font-size:20px;"></i>Settings</button>
+</nav>
+</sc-if>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ reportOpen }}" hint-placeholder-val="{{ false }}">
+<div class="dialog-backdrop" style="z-index:500;">
+<div class="dialog">
+<div class="dialog-title">Report this {{ reportTargetLabel }}</div>
+<div class="dialog-body">Your report is anonymous. Choose the reason that fits best.</div>
+<div style="display:flex;flex-direction:column;gap:8px;">
+<sc-for list="{{ reportReasons }}" as="r" hint-placeholder-count="5">
+<label class="radio"><input type="radio" checked="{{ r.checked }}" onChange="{{ r.onClick }}"/><span class="dot"></span>{{ r.label }}</label>
+</sc-for>
+</div>
+<sc-if value="{{ reportShowOther }}" hint-placeholder-val="{{ false }}">
+<textarea class="input" rows="3" placeholder="Tell us a bit more (optional)" value="{{ reportOtherText }}" onChange="{{ updateReportOther }}"></textarea>
+</sc-if>
+<div class="dialog-actions">
+<button class="btn btn-secondary" onClick="{{ closeReport }}">Cancel</button>
+<button class="btn btn-primary" disabled="{{ reportSubmitDisabled }}" onClick="{{ submitReport }}">Submit report</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;bottom:24px;left:50%;background:var(--color-surface);box-shadow:var(--shadow-lg);border-radius:999px;padding:10px 18px;display:flex;align-items:center;gap:8px;font-size:13px;z-index:600;animation:offrecord-toastin .2s ease;">
+<i class="ph ph-check-circle" style="color:var(--color-accent);"></i>{{ toast }}
+</div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+class Component extends DCLogic {
+  state = {
+    joined: false, inviteInput: '', route: 'home', navSelection: 'home', deviceMode: 'mobile',
+    activeCategory: 'All', sortMode: 'trending', searchQuery: '',
+    composerText: '', composerCategory: 'Confession', composerAnon: true,
+    selectedPostId: null, postLoading: false, postMenuOpen: false,
+    commentDraft: '', commentError: '',
+    reportTarget: null, reportReason: '', reportOtherText: '',
+    toast: null, loading: false, connectionBannerDismissed: false,
+    notifOpen: false, moreMenuOpenId: null,
+    notifReplies: true, notifDigest: false, defaultAnonPosting: true,
+    currentUser: { pseudonym: 'quietkoala82', joinDate: 'Jan 14, 2026' },
+    inviteCodes: ['OFFR-4K2X', 'OFFR-9PLM', 'OFFR-QW3R'],
+    posts: [
+      { id: 'p1', pseudonym: 'midnightoodle', category: 'Confession', text: "I ate an entire pizza alone in the library during finals week and made zero eye contact with anyone. No regrets.", reactions: 128, reacted: false, commentCount: 24, time: '3h ago', status: 'published' },
+      { id: 'p2', pseudonym: 'unclockedmoth', category: 'Question', text: "Does anyone know if the add/drop deadline moved or is my planner just gaslighting me at this point", reactions: 41, reacted: false, commentCount: 12, time: '5h ago', status: 'published' },
+      { id: 'p3', pseudonym: 'Anonymous', category: 'Rant', text: "The dining hall wifi has never once worked past 6pm and yet the router just sits there blinking like it's thriving. We see you.", reactions: 203, reacted: false, commentCount: 38, time: '1h ago', status: 'published' },
+      { id: 'p4', pseudonym: 'damp_croissant', category: 'Funny', text: "Professor's slide literally said 'insert joke here' and then just moved on to the next slide. King behavior honestly.", reactions: 312, reacted: false, commentCount: 45, time: '2h ago', status: 'published' },
+      { id: 'p5', pseudonym: 'quietkoala82', category: 'Advice', text: "How do you actually start talking to your advisor without it being weird. Asking for a friend (it's me)", reactions: 19, reacted: false, commentCount: 7, time: '1d ago', status: 'published' },
+      { id: 'p6', pseudonym: 'papercut_prophet', category: 'Other', text: "Reminder that the vending machine on the 3rd floor gives change now. Changed my whole week honestly.", reactions: 56, reacted: false, commentCount: 5, time: '6h ago', status: 'published' },
+      { id: 'p7', pseudonym: 'slowparadelane', category: 'Confession', text: "I've been going to the wrong lecture hall for two weeks and the class was actually fine so I just kept going.", reactions: 89, reacted: false, commentCount: 15, time: '9h ago', status: 'published' },
+      { id: 'p8', pseudonym: 'Anonymous', category: 'Question', text: "Is it normal to still not know anyone's name in a class of 12 people, six weeks in", reactions: 24, reacted: false, commentCount: 9, time: '12h ago', status: 'published' },
+      { id: 'p9', pseudonym: 'hallway_ghost', category: 'Rant', text: "Printers in the library charge you for jams that are the printer's fault and this is basically theft at this point", reactions: 67, reacted: false, commentCount: 11, time: '1d ago', status: 'published' }
+    ],
+    comments: {
+      p1: [
+        { id: 'c1', pseudonym: 'papercut_prophet', text: 'the way i felt this in my soul', reactions: 14, reacted: false },
+        { id: 'c2', pseudonym: 'Anonymous', text: 'library pizza is a rite of passage tbh', reactions: 8, reacted: false }
+      ],
+      p3: [
+        { id: 'c3', pseudonym: 'damp_croissant', text: 'it works great at 2am for some reason', reactions: 5, reacted: false }
+      ]
+    }
+  };
+
+  categories = ['Confession', 'Question', 'Rant', 'Funny', 'Advice', 'Other'];
+
+  tagClassFor(cat) {
+    return { Confession: 'tag-accent', Question: 'tag-accent-2', Rant: 'tag-outline', Funny: 'tag-neutral', Advice: 'tag-accent', Other: 'tag-neutral' }[cat] || 'tag-neutral';
+  }
+
+  simulateLoad() {
+    this.setState({ loading: true });
+    clearTimeout(this._lt);
+    this._lt = setTimeout(() => this.setState({ loading: false }), 550);
+  }
+
+  showToast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  navTo(key) {
+    const patch = { moreMenuOpenId: null, notifOpen: false, navSelection: key };
+    if (key === 'home') { patch.route = 'home'; patch.activeCategory = 'All'; patch.sortMode = 'trending'; }
+    else if (key === 'trending') { patch.route = 'home'; patch.sortMode = 'trending'; }
+    else if (key === 'latest') { patch.route = 'home'; patch.sortMode = 'latest'; }
+    else { patch.route = key; }
+    this.setState(patch);
+    if (patch.route === 'home') this.simulateLoad();
+  }
+
+  submitInvite(e) {
+    e.preventDefault();
+    if (!this.state.inviteInput.trim()) return;
+    this.setState({ joined: true, route: 'home' });
+    this.showToast('Welcome to OffRecord 👋');
+  }
+
+  openPost(id) {
+    this.setState({ selectedPostId: id, route: 'post', navSelection: 'home', commentDraft: '', commentError: '', postMenuOpen: false, postLoading: true, moreMenuOpenId: null });
+    clearTimeout(this._pl);
+    this._pl = setTimeout(() => this.setState({ postLoading: false }), 400);
+  }
+
+  toggleReaction(id) {
+    this.setState(s => ({ posts: s.posts.map(p => p.id === id ? { ...p, reacted: !p.reacted, reactions: p.reacted ? p.reactions - 1 : p.reactions + 1 } : p) }));
+  }
+
+  toggleCommentReaction(postId, cid) {
+    this.setState(s => {
+      const list = (s.comments[postId] || []).map(c => c.id === cid ? { ...c, reacted: !c.reacted, reactions: c.reacted ? c.reactions - 1 : c.reactions + 1 } : c);
+      return { comments: { ...s.comments, [postId]: list } };
+    });
+  }
+
+  toggleMoreMenu(id) { this.setState(s => ({ moreMenuOpenId: s.moreMenuOpenId === id ? null : id })); }
+  togglePostMenu() { this.setState(s => ({ postMenuOpen: !s.postMenuOpen })); }
+  toggleCommentMenu(cid) { this.setState(s => ({ moreMenuOpenId: s.moreMenuOpenId === cid ? null : cid })); }
+
+  openReport(kind, id) { this.setState({ reportTarget: { kind, id }, reportReason: '', reportOtherText: '', moreMenuOpenId: null, postMenuOpen: false }); }
+  closeReport() { this.setState({ reportTarget: null }); }
+  setReportReason(r) { this.setState({ reportReason: r }); }
+  updateReportOther(e) { this.setState({ reportOtherText: e.target.value }); }
+  submitReport() {
+    if (!this.state.reportReason) return;
+    this.setState({ reportTarget: null });
+    this.showToast('Report submitted — thanks for helping keep OffRecord safe.');
+  }
+
+  setCategory(cat) { this.setState({ activeCategory: cat }); this.simulateLoad(); }
+  setSort(mode) { this.setState({ sortMode: mode }); this.simulateLoad(); }
+
+  updateSearchQuery(e) { this.setState({ searchQuery: e.target.value }); }
+  updateComposerText(e) { this.setState({ composerText: e.target.value }); }
+  setComposerCategory(cat) { this.setState({ composerCategory: cat }); }
+  updateInviteInput(e) { this.setState({ inviteInput: e.target.value }); }
+  updateCommentDraft(e) { this.setState({ commentDraft: e.target.value, commentError: '' }); }
+
+  submitComposer() {
+    const text = this.state.composerText.trim();
+    if (!text || text.length > 500) return;
+    const id = 'p' + Date.now();
+    const newPost = { id, pseudonym: this.state.composerAnon ? 'Anonymous' : this.state.currentUser.pseudonym, category: this.state.composerCategory, text, reactions: 0, reacted: false, commentCount: 0, time: 'just now', status: 'pending' };
+    this.setState(s => ({ posts: [newPost, ...s.posts], composerText: '', route: 'home', navSelection: 'home', activeCategory: 'All', sortMode: 'trending' }));
+    this.showToast('Post submitted for review');
+    this.simulateLoad();
+    clearTimeout(this._pt);
+    this._pt = setTimeout(() => { this.setState(s => ({ posts: s.posts.map(p => p.id === id ? { ...p, status: 'published' } : p) })); }, 4000);
+  }
+
+  submitComment() {
+    const text = this.state.commentDraft.trim();
+    if (!text) { this.setState({ commentError: "Comment can't be empty." }); return; }
+    const pid = this.state.selectedPostId;
+    const cid = 'c' + Date.now();
+    const newComment = { id: cid, pseudonym: this.state.currentUser.pseudonym, text, reactions: 0, reacted: false };
+    this.setState(s => ({
+      comments: { ...s.comments, [pid]: [...(s.comments[pid] || []), newComment] },
+      posts: s.posts.map(p => p.id === pid ? { ...p, commentCount: p.commentCount + 1 } : p),
+      commentDraft: ''
+    }));
+  }
+
+  dismissConnectionBanner() { this.setState({ connectionBannerDismissed: true }); }
+  retryConnection() { this.setState({ connectionBannerDismissed: true }); this.showToast('Reconnected'); }
+  toggleNotif() { this.setState(s => ({ notifOpen: !s.notifOpen })); }
+  copyInviteCode(code) { this.showToast('Copied ' + code); }
+  logout() { this.setState({ joined: false, inviteInput: '', route: 'home', navSelection: 'home' }); }
+
+  chipStyle(active) {
+    return {
+      padding: '6px 14px', borderRadius: '999px', fontSize: '13px', fontFamily: 'var(--font-heading)', fontWeight: 500,
+      cursor: 'pointer', border: active ? '1px solid var(--color-accent)' : '1px solid var(--color-divider)',
+      background: active ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
+      color: active ? 'var(--color-accent)' : 'var(--color-text)', whiteSpace: 'nowrap', flex: '0 0 auto'
+    };
+  }
+
+  navBtnDesktopStyle(active) {
+    return {
+      display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 10px', borderRadius: 'var(--radius-md)',
+      border: 'none', background: active ? 'color-mix(in srgb, var(--color-accent) 12%, transparent)' : 'transparent',
+      color: active ? 'var(--color-accent)' : 'var(--color-text)', fontFamily: 'var(--font-heading)', fontWeight: 500,
+      fontSize: '14px', cursor: 'pointer', textAlign: 'left'
+    };
+  }
+
+  mobileNavBtnStyle(active) {
+    return {
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', color: active ? 'var(--color-accent)' : 'var(--color-neutral-500)',
+      background: 'none', border: 'none', fontFamily: 'var(--font-body)', fontSize: '10px', cursor: 'pointer', padding: '4px 10px', minWidth: '44px', minHeight: '44px', justifyContent: 'center'
+    };
+  }
+
+  reactBtnStyle(reacted) {
+    return { display: 'flex', alignItems: 'center', gap: '5px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '12.5px', color: reacted ? 'var(--color-accent)' : 'var(--color-neutral-500)', padding: 0 };
+  }
+
+  switchStyle(on) { return { width: '40px', height: '22px', borderRadius: '999px', background: on ? 'var(--color-accent)' : 'var(--color-neutral-700)', position: 'relative', cursor: 'pointer', flexShrink: 0, transition: 'background .15s' }; }
+  knobStyle(on) { return { position: 'absolute', top: '2px', left: on ? '20px' : '2px', width: '18px', height: '18px', borderRadius: '50%', background: 'var(--color-neutral-100)', transition: 'left .15s' }; }
+
+  renderVals() {
+    const s = this.state;
+    const isMobile = s.deviceMode === 'mobile';
+    const isDesktop = !isMobile;
+
+    const shellStyle = isMobile
+      ? { position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '430px', height: '844px', margin: '0 auto', background: 'var(--color-bg)', border: '1px solid var(--color-divider)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }
+      : { position: 'relative', display: 'grid', gridTemplateColumns: '230px 1fr 280px', gap: '8px', width: '100%', maxWidth: '1180px', minHeight: '780px', margin: '40px auto', padding: '0' };
+
+    const mainStyle = isMobile
+      ? { flex: '1 1 auto', overflowY: 'auto', padding: '16px' }
+      : { padding: '28px 20px', minWidth: 0, borderLeft: '1px solid var(--color-divider)', borderRight: '1px solid var(--color-divider)' };
+
+    const visiblePosts = s.posts.filter(p => p.status === 'published' || p.pseudonym === s.currentUser.pseudonym);
+    const byCategory = s.activeCategory === 'All' ? visiblePosts : visiblePosts.filter(p => p.category === s.activeCategory);
+    let sorted = byCategory;
+    if (s.sortMode === 'trending') sorted = [...byCategory].sort((a, b) => b.reactions - a.reactions);
+    else if (s.sortMode === 'discussed') sorted = [...byCategory].sort((a, b) => b.commentCount - a.commentCount);
+
+    const mapPost = (p, opts) => ({
+      ...p, tagClass: this.tagClassFor(p.category),
+      showMoreMenu: s.moreMenuOpenId === p.id,
+      reactIcon: p.reacted ? 'ph-heart-fill' : 'ph-heart',
+      reactBtnStyle: this.reactBtnStyle(p.reacted),
+      excerpt: p.text.length > 200 ? p.text.slice(0, 200) + '…' : p.text,
+      pendingBadge: p.status === 'pending',
+      onOpen: () => this.openPost(p.id),
+      onReact: (e) => { e.stopPropagation(); this.toggleReaction(p.id); },
+      onToggleMenu: (e) => { e.stopPropagation(); this.toggleMoreMenu(p.id); },
+      onReport: () => this.openReport('post', p.id)
+    });
+
+    const feedPosts = sorted.map(p => mapPost(p));
+
+    const filterCategories = ['All', ...this.categories].map(c => ({
+      name: c, style: this.chipStyle(c === s.activeCategory), onClick: () => this.setCategory(c)
+    }));
+
+    const sidebarCategories = this.categories.map(c => ({
+      name: c, sidebarStyle: this.navBtnDesktopStyle(c === s.activeCategory && s.navSelection === 'home'),
+      onClick: () => { this.setState({ activeCategory: c, route: 'home', navSelection: 'home' }); this.simulateLoad(); }
+    }));
+
+    const trendingPreview = [...visiblePosts].sort((a, b) => b.reactions - a.reactions).slice(0, 3).map(p => ({
+      category: p.category, tagClass: this.tagClassFor(p.category),
+      excerpt: p.text.length > 90 ? p.text.slice(0, 90) + '…' : p.text,
+      onOpen: () => this.openPost(p.id)
+    }));
+
+    const query = s.searchQuery.trim().toLowerCase();
+    const searchResults = query ? visiblePosts.filter(p =>
+      p.text.toLowerCase().includes(query) || p.category.toLowerCase().includes(query) || p.pseudonym.toLowerCase().includes(query)
+    ).map(p => mapPost(p)) : [];
+
+    const searchSuggestions = [...this.categories.slice(0, 3), s.currentUser.pseudonym].map(v => ({
+      label: v, onClick: () => this.setState({ searchQuery: v })
+    }));
+
+    const selectedPostRaw = s.posts.find(p => p.id === s.selectedPostId);
+    const selectedPost = selectedPostRaw ? {
+      ...selectedPostRaw, tagClass: this.tagClassFor(selectedPostRaw.category),
+      reactIcon: selectedPostRaw.reacted ? 'ph-heart-fill' : 'ph-heart',
+      reactBtnStyle: this.reactBtnStyle(selectedPostRaw.reacted),
+      onReact: () => this.toggleReaction(selectedPostRaw.id)
+    } : null;
+
+    const postComments = (s.comments[s.selectedPostId] || []).map(c => ({
+      ...c, reactIcon: c.reacted ? 'ph-heart-fill' : 'ph-heart',
+      reactBtnStyle: this.reactBtnStyle(c.reacted),
+      showMenu: s.moreMenuOpenId === c.id,
+      onReact: () => this.toggleCommentReaction(s.selectedPostId, c.id),
+      onToggleMenu: () => this.toggleCommentMenu(c.id),
+      onReport: () => this.openReport('comment', c.id)
+    }));
+
+    const profilePosts = s.posts.filter(p => p.pseudonym === s.currentUser.pseudonym && p.status === 'published').map(p => mapPost(p));
+
+    const composerCharCount = s.composerText.length;
+    const composerOverLimit = composerCharCount > 500;
+    const composerDisabled = !s.composerText.trim() || composerOverLimit;
+    const composerCategoryChips = this.categories.map(c => ({
+      name: c, style: this.chipStyle(c === s.composerCategory), onClick: () => this.setComposerCategory(c)
+    }));
+
+    const reportKind = s.reportTarget ? s.reportTarget.kind : null;
+    const reasons = ['Harassment', 'Spam', 'Personal information', 'Threatening content', 'Other'];
+    const reportReasons = reasons.map(r => ({ label: r, checked: s.reportReason === r, onClick: () => this.setReportReason(r) }));
+
+    const homeActive = s.navSelection === 'home', trendingActive = s.navSelection === 'trending', latestActive = s.navSelection === 'latest',
+      searchActive = s.navSelection === 'search', createActive = s.navSelection === 'create', profileActive = s.navSelection === 'profile', settingsActive = s.navSelection === 'settings';
+
+    return {
+      isMobile, isDesktop,
+      pageWrapStyle: { minHeight: '100vh', background: 'var(--color-bg)', color: 'var(--color-text)', fontFamily: 'var(--font-body)', padding: isMobile ? '48px 0' : '0' },
+      deviceToggleStyle: { position: 'fixed', top: '10px', right: '10px', display: 'flex', alignItems: 'center', background: 'var(--color-surface)', borderRadius: '999px', padding: '4px 8px', zIndex: 1000, boxShadow: 'var(--shadow-sm)' },
+      setMobile: () => this.setState({ deviceMode: 'mobile' }), setDesktop: () => this.setState({ deviceMode: 'desktop' }),
+      showOnboarding: !s.joined, showApp: s.joined,
+      inviteInput: s.inviteInput, updateInviteInput: (e) => this.updateInviteInput(e), submitInvite: (e) => this.submitInvite(e),
+      shellStyle, mainStyle,
+      currentUser: s.currentUser, userInitials: s.currentUser.pseudonym.slice(0, 2).toUpperCase(),
+      avatarStyle: { width: '34px', height: '34px', borderRadius: '50%', background: 'var(--color-accent-800)', color: 'var(--color-accent-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '13px', flexShrink: 0 },
+      avatarStyleLg: { width: '56px', height: '56px', borderRadius: '50%', background: 'var(--color-accent-800)', color: 'var(--color-accent-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '18px', flexShrink: 0 },
+
+      homeIcon: homeActive ? 'ph-house-fill' : 'ph-house', trendingIcon: trendingActive ? 'ph-fire-fill' : 'ph-fire',
+      latestIcon: latestActive ? 'ph-clock-fill' : 'ph-clock', searchIcon: searchActive ? 'ph-magnifying-glass' : 'ph-magnifying-glass',
+      profileIcon: profileActive ? 'ph-user-fill' : 'ph-user', settingsIcon: settingsActive ? 'ph-gear-fill' : 'ph-gear',
+      navBtnStyleD: {
+        home: this.navBtnDesktopStyle(homeActive), trending: this.navBtnDesktopStyle(trendingActive), latest: this.navBtnDesktopStyle(latestActive),
+        search: this.navBtnDesktopStyle(searchActive), profile: this.navBtnDesktopStyle(profileActive), settings: this.navBtnDesktopStyle(settingsActive)
+      },
+      mobileNavStyle: {
+        home: this.mobileNavBtnStyle(homeActive), search: this.mobileNavBtnStyle(searchActive),
+        profile: this.mobileNavBtnStyle(profileActive), settings: this.mobileNavBtnStyle(settingsActive)
+      },
+      fabStyle: { width: '52px', height: '52px', borderRadius: '50%', background: 'var(--color-surface)', border: '1.5px solid var(--color-accent)', color: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transform: 'translateY(-14px)', boxShadow: 'var(--shadow-md)' },
+      navHome: () => this.navTo('home'), navTrending: () => this.navTo('trending'), navLatest: () => this.navTo('latest'),
+      navSearch: () => this.navTo('search'), navCreate: () => this.navTo('create'), navProfile: () => this.navTo('profile'), navSettings: () => this.navTo('settings'),
+
+      toggleNotif: () => this.toggleNotif(), notifOpen: s.notifOpen,
+
+      routeIsHome: s.route === 'home', routeIsSearch: s.route === 'search', routeIsCreate: s.route === 'create',
+      routeIsPost: s.route === 'post', routeIsProfile: s.route === 'profile', routeIsSettings: s.route === 'settings',
+
+      showConnectionBanner: !s.connectionBannerDismissed, dismissConnectionBanner: () => this.dismissConnectionBanner(), retryConnection: () => this.retryConnection(),
+      feedHeading: s.sortMode === 'trending' ? 'Trending' : s.sortMode === 'latest' ? 'Latest' : 'Most discussed',
+      sortTrending: s.sortMode === 'trending', sortLatest: s.sortMode === 'latest', sortDiscussed: s.sortMode === 'discussed',
+      setSortTrending: () => this.setSort('trending'), setSortLatest: () => this.setSort('latest'), setSortDiscussed: () => this.setSort('discussed'),
+      filterCategories, activeCategory: s.activeCategory,
+      loading: s.loading,
+      skeletonRows: [1, 2, 3].map(() => ({
+        line1: { width: '35%', height: '11px', borderRadius: '4px', background: 'linear-gradient(90deg,var(--color-neutral-800) 25%,var(--color-neutral-700) 37%,var(--color-neutral-800) 63%)', backgroundSize: '400px 100%', animation: 'offrecord-shimmer 1.4s infinite' },
+        line2: { width: '95%', height: '11px', borderRadius: '4px', background: 'linear-gradient(90deg,var(--color-neutral-800) 25%,var(--color-neutral-700) 37%,var(--color-neutral-800) 63%)', backgroundSize: '400px 100%', animation: 'offrecord-shimmer 1.4s infinite' },
+        line3: { width: '60%', height: '11px', borderRadius: '4px', background: 'linear-gradient(90deg,var(--color-neutral-800) 25%,var(--color-neutral-700) 37%,var(--color-neutral-800) 63%)', backgroundSize: '400px 100%', animation: 'offrecord-shimmer 1.4s infinite' }
+      })),
+      feedEmpty: !s.loading && feedPosts.length === 0, showFeedList: !s.loading && feedPosts.length > 0,
+      feedPosts, commentBtnStyle: { display: 'flex', alignItems: 'center', gap: '5px', border: 'none', background: 'none', color: 'var(--color-neutral-500)', fontSize: '12.5px', padding: 0, cursor: 'pointer' },
+
+      searchQuery: s.searchQuery, updateSearchQuery: (e) => this.updateSearchQuery(e),
+      searchHasQuery: !!query, searchNoQuery: !query, searchSuggestions,
+      searchEmpty: !!query && searchResults.length === 0, searchHasResults: !!query && searchResults.length > 0, searchResults,
+
+      composerCategoryChips, composerText: s.composerText, updateComposerText: (e) => this.updateComposerText(e),
+      composerCharCount, composerCounterColor: composerOverLimit ? 'var(--color-accent-300)' : 'var(--color-neutral-600)',
+      composerAnon: s.composerAnon, composerNotAnon: !s.composerAnon,
+      setComposerAnonTrue: () => this.setState({ composerAnon: true }), setComposerAnonFalse: () => this.setState({ composerAnon: false }),
+      composerDisabled, submitComposer: () => this.submitComposer(),
+
+      postLoading: s.postLoading, postReady: !s.postLoading && !!selectedPost, selectedPost,
+      postMenuOpen: s.postMenuOpen, togglePostMenu: () => this.togglePostMenu(),
+      reportSelectedPost: () => selectedPost && this.openReport('post', selectedPost.id),
+      postComments, commentsEmpty: postComments.length === 0,
+      commentDraft: s.commentDraft, updateCommentDraft: (e) => this.updateCommentDraft(e), submitComment: () => this.submitComment(),
+      hasCommentError: !!s.commentError, commentError: s.commentError,
+
+      profilePostCount: profilePosts.length, profilePosts, profileEmpty: profilePosts.length === 0,
+      inviteCodeRows: s.inviteCodes.map(code => ({ code, onCopy: () => this.copyInviteCode(code) })),
+
+      notifRepliesTrack: this.switchStyle(s.notifReplies), notifRepliesKnob: this.knobStyle(s.notifReplies), toggleNotifReplies: () => this.setState({ notifReplies: !s.notifReplies }),
+      notifDigestTrack: this.switchStyle(s.notifDigest), notifDigestKnob: this.knobStyle(s.notifDigest), toggleNotifDigest: () => this.setState({ notifDigest: !s.notifDigest }),
+      defaultAnonTrack: this.switchStyle(s.defaultAnonPosting), defaultAnonKnob: this.knobStyle(s.defaultAnonPosting), toggleDefaultAnon: () => this.setState({ defaultAnonPosting: !s.defaultAnonPosting }),
+      logout: () => this.logout(),
+
+      trendingPreview, sidebarCategories,
+
+      reportOpen: !!s.reportTarget, reportTargetLabel: reportKind === 'comment' ? 'comment' : 'post',
+      reportReasons, reportShowOther: s.reportReason === 'Other', reportOtherText: s.reportOtherText, updateReportOther: (e) => this.updateReportOther(e),
+      reportSubmitDisabled: !s.reportReason, closeReport: () => this.closeReport(), submitReport: () => this.submitReport(),
+
+      toastVisible: !!s.toast, toast: s.toast
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,504 @@
+/* ============================================================================
+   OffRecord — base element styles + shared component classes.
+   Ported from the Nocturne design system and retuned for the two themes.
+   ========================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Stops iOS Safari zooming when a field is focused and stops the page
+     shifting sideways when a menu opens. */
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv11", "ss01";
+  /* Never sideways-scroll on a phone. */
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-2);
+  text-wrap: balance;
+}
+
+/* Fluid sizes: the same scale reads correctly from a 320px phone up to a
+   desktop without per-breakpoint overrides. */
+h1 { font-size: clamp(28px, 6vw, 40px); }
+h2 { font-size: clamp(24px, 5vw, 31px); }
+h3 { font-size: clamp(20px, 4vw, 25px); }
+h4 { font-size: clamp(18px, 3.2vw, 20px); }
+h5 { font-size: 16px; }
+h6 {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 var(--space-3);
+  /* Long confessions shouldn't leave one orphaned word on the last line. */
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--color-accent-text);
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+a:hover {
+  color: var(--color-accent);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: var(--color-accent-tint-hover);
+}
+
+/* Respect the OS "reduce motion" setting — some users get motion sickness,
+   and this is a one-time cost to get right. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* — utilities — */
+.text-muted { color: var(--color-text-muted); }
+.text-faint { color: var(--color-text-faint); }
+.mono { font-family: var(--font-mono); }
+
+/* Visible only to screen readers — used for labels on icon-only buttons. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hr {
+  height: 1px;
+  border: 0;
+  margin: var(--space-5) 0;
+  background: var(--color-divider);
+}
+
+/* ----------------------------------------------------------------------------
+   Buttons — Nocturne's rule holds: the primary action is an accent outline,
+   never a saturated fill.
+-------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--color-text);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 10px var(--space-4);
+  min-height: var(--tap);
+  border-radius: var(--radius-md);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    opacity var(--transition-fast);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(0.5px);
+}
+
+.btn-primary {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.btn-primary:hover:not(:disabled) { background: var(--color-accent-tint); }
+.btn-primary:active:not(:disabled) { background: var(--color-accent-tint-hover); }
+
+.btn-secondary {
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+.btn-secondary:hover:not(:disabled) { background: var(--color-surface-raised); }
+
+.btn-ghost {
+  color: var(--color-text-muted);
+  padding-inline: var(--space-3);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.btn-danger {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+.btn-danger:hover:not(:disabled) { background: var(--color-danger-tint); }
+
+.btn-icon {
+  width: var(--tap);
+  height: var(--tap);
+  min-height: var(--tap);
+  padding: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+}
+.btn-icon:hover:not(:disabled) {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-sm {
+  min-height: 34px;
+  padding: 6px var(--space-3);
+  font-size: 13px;
+}
+
+/* ----------------------------------------------------------------------------
+   Form fields
+-------------------------------------------------------------------------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.field > label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 11px var(--space-4);
+  font: inherit;
+  /* 16px minimum: anything smaller makes iOS Safari zoom the page on focus,
+     which is disorienting and hard to recover from one-handed. */
+  font-size: 16px;
+  color: var(--color-text);
+  caret-color: var(--color-accent);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.input::placeholder {
+  color: var(--color-text-faint);
+}
+.input:hover:not(:focus) {
+  border-color: var(--color-border-strong);
+}
+.input:focus-visible {
+  border-color: var(--color-accent);
+  outline: 1px solid var(--color-accent);
+  outline-offset: -1px;
+}
+textarea.input {
+  min-height: 130px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  font-size: 15px;
+  min-height: var(--tap);
+  padding: var(--space-2) 0;
+}
+.radio input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.radio .dot {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border-strong);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.radio:hover .dot {
+  border-color: var(--color-accent);
+}
+.radio input:checked + .dot {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  box-shadow: inset 0 0 0 4px var(--color-bg);
+}
+.radio input:focus-visible + .dot {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Segmented control */
+.seg {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.seg-opt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 9px var(--space-4);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.seg-opt input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.seg-opt + .seg-opt {
+  border-left: 1px solid var(--color-border);
+}
+.seg-opt:has(input:checked) {
+  color: var(--color-accent);
+  background: var(--color-accent-tint);
+}
+.seg-opt:not(:has(input:checked)):hover {
+  color: var(--color-text);
+}
+.seg-opt:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+/* ----------------------------------------------------------------------------
+   Cards
+-------------------------------------------------------------------------- */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.elev-sm { box-shadow: var(--shadow-sm); }
+.elev-md { box-shadow: var(--shadow-md); }
+.elev-lg { box-shadow: var(--shadow-lg); }
+
+/* ----------------------------------------------------------------------------
+   Tags — category pills. Kept tonal and low-chroma; the category is a label,
+   not a decoration, so it must never outshout the post text.
+-------------------------------------------------------------------------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.tag-accent {
+  background: var(--color-accent-tint);
+  color: var(--color-accent-text);
+  border-color: var(--color-accent-tint-hover);
+}
+.tag-neutral {
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+.tag-outline {
+  color: var(--color-text-muted);
+  border-color: var(--color-border-strong);
+}
+.tag-danger {
+  background: var(--color-danger-tint);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* ----------------------------------------------------------------------------
+   Chips — the scrollable category filter row
+-------------------------------------------------------------------------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 8px var(--space-4);
+  min-height: 38px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-heading);
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+.chip:hover {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+.chip[aria-pressed="true"] {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: var(--color-accent-tint);
+}
+
+/* ----------------------------------------------------------------------------
+   Dialog
+-------------------------------------------------------------------------- */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  z-index: 500;
+}
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  /* A tall report dialog must still be dismissable on a small phone. */
+  max-height: calc(100dvh - var(--space-10));
+  overflow-y: auto;
+}
+.dialog-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.dialog-body {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* ----------------------------------------------------------------------------
+   Skeleton loading
+-------------------------------------------------------------------------- */
+@keyframes offrecord-shimmer {
+  0% { background-position: -320px 0; }
+  100% { background-position: 320px 0; }
+}
+.skeleton {
+  height: 12px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base) 25%,
+    var(--skeleton-sheen) 37%,
+    var(--skeleton-base) 63%
+  );
+  background-size: 640px 100%;
+  animation: offrecord-shimmer 1.4s infinite linear;
+}
+
+@keyframes offrecord-fadein {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: offrecord-fadein 0.25s ease;
+}

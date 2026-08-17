@@ -18,6 +18,12 @@ on:
     branches:
       - main
       - "claude/**"
+    # The OffRecord web app (Next.js) lives in offrecord/ and has nothing to do
+    # with the Flutter release pipeline — a web-only commit must not build an
+    # APK or cut a release. Docs-only commits are skipped for the same reason.
+    paths-ignore:
+      - "offrecord/**"
+      - "**/*.md"
   workflow_dispatch:
 
 concurrency:
