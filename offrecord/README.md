@@ -76,6 +76,27 @@ offrecord/
 └── design-reference/     # the original Stitch export (not built, not run)
 ```
 
+## Deploying (Vercel)
+
+This app lives in a subdirectory of a repo whose root is a Flutter project, so
+**Vercel must be told where the app is** or the build fails immediately with
+"no package.json found":
+
+1. Import `nikhilcherry/project_monarch` in Vercel.
+2. Set **Root Directory** to `offrecord`. Everything else (framework preset,
+   build command, output) is detected correctly once that's set.
+3. Under **Settings → Git**, restrict production deploys to the branches you
+   actually want live — otherwise every Flutter commit on `main` triggers a
+   redundant web build.
+
+Nothing else is needed today: there are no environment variables yet. When
+Supabase lands in step 2, its URL and publishable key go in Vercel's
+environment variables. The service-role key never goes in this project — it
+belongs only to server-side code, never to anything the browser can read.
+
+Vercel's Hobby plan is free for non-commercial projects, which OffRecord is as
+long as it carries no ads or paid features.
+
 ## CI
 
 The repository root runs a Flutter release pipeline
