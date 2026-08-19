@@ -131,6 +131,16 @@ jobs:
         if: steps.guard.outputs.skip == 'false'
         run: flutter analyze 2>&1 | tee analyze.log || true
 
+      # Gate the release on the suite, for the same reason the build runs before
+      # tagging: a version that fails its own tests should not become a release
+      # anybody can download. This runs before the APK build so a logic
+      # regression is reported in seconds rather than after a full Gradle run.
+      - name: Tests
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          set -o pipefail
+          flutter test 2>&1 | tee test.log
+
       - name: Build release APK
         if: steps.guard.outputs.skip == 'false'
         run: |
@@ -179,6 +189,10 @@ jobs:
           {
             echo "Automated build failed for commit \`${{ github.sha }}\` on \`${{ github.ref_name }}\`."
             echo
+            echo "### flutter test (tail)"
+            echo '```'
+            tail -n 120 test.log 2>/dev/null || echo "(no test.log — failed before the tests)"
+            echo '```'
             echo "### flutter build apk (tail)"
             echo '```'
             tail -n 150 build.log 2>/dev/null || echo "(no build.log — failed before build)"

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/consistency_log.dart';
 import '../models/enums.dart';
 import '../models/exercise_entry.dart';
 import '../models/workout_node.dart';

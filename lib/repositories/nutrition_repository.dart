@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 
-import '../core/database/hive_boxes.dart';
 import '../models/nutrition_day.dart';
 import 'consistency_repository.dart';
 

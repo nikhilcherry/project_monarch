@@ -1,0 +1,44 @@
+name: ci
+
+# Tests on every push and pull request, with no release attached.
+#
+# The release workflow gates on the suite too, but it only ever runs when a
+# version is being cut — so until now a change could sit on a branch, or in a
+# pull request, with nothing having run the 35 tests against it. This is the
+# cheap check that runs everywhere; auto-version.yml stays the gate that stops
+# a failing commit from becoming a downloadable APK.
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          # Must match auto-version.yml. The project targets Dart 3.5, and the
+          # theme code here is written against the pre-3.27 Flutter API — newer
+          # SDKs rename CardTheme/DialogTheme and deprecate Color.withOpacity,
+          # so testing on a different version would not be testing what ships.
+          flutter-version: "3.24.5"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code (Hive adapters, etc.)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Static analysis
+        run: flutter analyze
+
+      - name: Tests
+        run: flutter test
